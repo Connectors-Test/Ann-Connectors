@@ -7,11 +7,14 @@ password = os.environ.get("MsSQLPsswd", "")
 
 @app.route("/fetch-databases", methods=["GET"])
 def fetch_databases():
-    
-    conn = MSSQLConnector(password=password)
-    result = conn.fetch_databases()
-    conn.close()
-    return jsonify(result)
+    try:
+        conn = MSSQLConnector(password=password)
+        result = conn.fetch_databases()
+        conn.close()
+        return jsonify(result)
+    except Exception as e:
+        print("Error in /fetch-databases:", e)
+        return jsonify({"error": str(e)}), 500
 
 @app.route("/fetch-tables", methods=["GET"])
 def fetch_tables():
