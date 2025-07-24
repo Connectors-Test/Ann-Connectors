@@ -40,7 +40,10 @@ class MSSQLConnector:
             # self.cursor = self.conn.cursor()
             print(f"[✓] Connected to {self.database or 'server'} as {self.user}")
         except Exception as e:
+            self.conn = None
+            self.cursor = None
             print(f"[!] Connection failed: {e}")
+            raise RuntimeError(f"[!] Connection failed: {e}")
 
     # Fetching method 1 - gives result as lists -  can test using testConnection.py
     def _fetch_databases(self):
