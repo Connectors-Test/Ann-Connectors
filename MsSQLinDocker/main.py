@@ -1,8 +1,9 @@
+import os
 from flask import Flask, request, jsonify
 from mssqlConnector import MSSQLConnector  # import your class
 
 app = Flask(__name__)
-password = 'Jesus<3sU4ever'
+password = os.environ.get("MsSQLPsswd", "")
 
 @app.route("/fetch-databases", methods=["GET"])
 def fetch_databases():
