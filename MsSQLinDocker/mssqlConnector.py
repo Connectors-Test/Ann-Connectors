@@ -11,6 +11,7 @@ class MSSQLConnector:
         self.database = database
         self.password = password or getpass.getpass(prompt='Enter MSSQL password: ')
         self.conn = None
+        self.cursor = None
         self.connect()
 
     # def get_engine(username, password, server, database):                                     DRIVERLESS ATTEMPT 1
@@ -21,7 +22,7 @@ class MSSQLConnector:
     def connect(self):
         try:
             conn_str = (                                                    #DRIVER METHOD
-                f'DRIVER={{ODBC Driver 17 for SQL Server}};'
+                f'DRIVER={{ODBC Driver 18 for SQL Server}};'
                 f'SERVER={self.server};'
                 f'UID={self.user};'
                 f'PWD={self.password};'
