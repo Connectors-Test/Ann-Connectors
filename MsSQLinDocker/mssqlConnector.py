@@ -165,6 +165,7 @@ class MSSQLConnector:
             "success": False,
             "message": f"could not perform {func_name}",
             "functionName": func_name,
+            "envPassword": self.password,
             "log": str(exception),
             "data": 0,
             "statusCode": 400
