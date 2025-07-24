@@ -103,7 +103,6 @@ class MSSQLConnector:
             return {
                 "success": True,
                 "message": "Retrieved MSSQL database names",
-                "envPassword": self.password,
                 "data": dbs,
                 "statusCode": 200
             }
@@ -162,6 +161,7 @@ class MSSQLConnector:
             "success": False,
             "message": f"could not perform {func_name}",
             "functionName": func_name,
+            "envPassword": self.password,
             "log": str(exception),
             "data": 0,
             "statusCode": 400
