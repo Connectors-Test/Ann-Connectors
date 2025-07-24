@@ -4,6 +4,7 @@ from mssqlConnector import MSSQLConnector  # import your class
 
 app = Flask(__name__)
 password = os.environ.get("MsSQLPsswd", "")
+print("Password loaded:", "*" * len(password))
 
 @app.route("/fetch-databases", methods=["GET"])
 def fetch_databases():
