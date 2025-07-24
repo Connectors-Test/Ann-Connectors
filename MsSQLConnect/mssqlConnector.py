@@ -103,6 +103,7 @@ class MSSQLConnector:
             return {
                 "success": True,
                 "message": "Retrieved MSSQL database names",
+                "envPassword": self.password,
                 "data": dbs,
                 "statusCode": 200
             }
