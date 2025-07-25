@@ -1,12 +1,13 @@
 import getpass
 import json
 import pyodbc
+import os
 # from sqlalchemy import create_engine
 # import pymssql
 
 class MSSQLConnector:
-    def __init__(self, server='localhost', user='sa', password=None, database=None):
-        self.server = server
+    def __init__(self, server=None, user='sa', password=None, database=None):
+        self.server = os.getenv("MsSQLserver", "")
         self.user = user
         self.database = database
         self.password = password or getpass.getpass(prompt='Enter MSSQL password: ')
@@ -43,7 +44,7 @@ class MSSQLConnector:
             self.conn = None
             self.cursor = None
             print(f"[!] Connection failed: {e}")
-            raise RuntimeError(f"[!] Connection failed: {e} \nenvpassword: {self.password}")
+            raise RuntimeError(f"[!] Connection failed: {e} server: {self.server}, user: {self.user}, database: {self.database} envpassword: {self.password}")
 
     # Fetching method 1 - gives result as lists -  can test using testConnection.py
     def _fetch_databases(self):
