@@ -9,7 +9,7 @@ class MSSQLConnector:
     def __init__(self, server=None, user='sa', password=None, database=None):
         self.server = os.getenv("MsSQLserver", "")
         self.user = user
-        self.database = database
+        self.database = os.environ.get("MsSQLdb", database)
         self.password = password or getpass.getpass(prompt='Enter MSSQL password: ')
         self.conn = None
         self.cursor = None
