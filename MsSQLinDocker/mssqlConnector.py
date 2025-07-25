@@ -2,15 +2,18 @@ import getpass
 import json
 import pyodbc
 import os
+from dotenv import load_dotenv
 # from sqlalchemy import create_engine
 # import pymssql
+
+load_dotenv()  
 
 class MSSQLConnector:
     def __init__(self, server=None, user='sa', password=None, database=None):
         self.server = os.getenv("MsSQLserver", "")
         self.user = user
         self.database = os.environ.get("MsSQLdb", database)
-        self.password = password or getpass.getpass(prompt='Enter MSSQL password: ')
+        self.password = os.environ.get("MsSQLPsswd", password) or getpass.getpass(prompt='Enter MSSQL password: ')
         self.conn = None
         self.cursor = None
         self.connect()
@@ -23,7 +26,7 @@ class MSSQLConnector:
     def connect(self):
         try:
             conn_str = (                                                    #DRIVER METHOD
-                f'DRIVER={{ODBC Driver 18 for SQL Server}};'
+                f'DRIVER={{ODBC Driver 17 for SQL Server}};'
                 f'SERVER={self.server};'
                 f'UID={self.user};'
                 f'PWD={self.password};'
@@ -36,7 +39,7 @@ class MSSQLConnector:
             # connection_string = f"mssql://{self.user}:{self.password}@{self.server}/{self.database or ''}"   
             # self.engine = create_engine(connection_string)
             # self.conn = self.engine.connect()
-            # # DRIVERLESS ATTEMPT 2
+            # DRIVERLESS ATTEMPT 2
             # self.conn = pymssql.connect(self.server, self.user, self.password, self.database)
             # self.cursor = self.conn.cursor()
             print(f"[✓] Connected to {self.database or 'server'} as {self.user}")
@@ -166,7 +169,6 @@ class MSSQLConnector:
             "success": False,
             "message": f"could not perform {func_name}",
             "functionName": func_name,
-            "envPassword": self.password,
             "log": str(exception),
             "data": 0,
             "statusCode": 400

@@ -5,3 +5,4 @@ __pycache__/
 package-lock.json
 package.json
 MsSQLConnect/__pycache__/
+MsSQLinDocker/.env
