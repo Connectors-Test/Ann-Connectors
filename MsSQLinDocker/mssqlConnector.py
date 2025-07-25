@@ -2,11 +2,11 @@ import getpass
 import json
 import pyodbc
 import os
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 # from sqlalchemy import create_engine
 # import pymssql
 
-load_dotenv()  
+# load_dotenv()  
 
 class MSSQLConnector:
     def __init__(self, server=None, user='sa', password=None, database=None):
