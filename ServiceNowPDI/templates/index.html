@@ -97,9 +97,16 @@
       btn.classList.add("text-black", "underline");
 
       try {
-        const res = await fetch(endpoint);
-        const data = await res.json();
-        document.getElementById('output').textContent = JSON.stringify(data, null, 2);
+        // If endpoint includes 'file', treat it as image
+        if (endpoint.includes('/file')) {
+            const res = await fetch(endpoint);
+            const blob = await res.blob();
+            const imgURL = URL.createObjectURL(blob);
+            output.innerHTML = `<img src="${imgURL}" alt="Downloaded Image" class="max-w-full border rounded shadow" />`;
+        } else {
+            const res = await fetch(endpoint);
+            const data = await res.json();
+            document.getElementById('output').textContent = JSON.stringify(data, null, 2);}
       } catch (err) {
         document.getElementById('output').textContent = 'Error fetching: ' + err;
       }
