@@ -1,6 +1,6 @@
 import os
 from flask import Flask, request, jsonify
-from MsSQLinDocker.app.mssqlConnector import MSSQLConnector  # import your class
+from app.mssqlConnector import MSSQLConnector  # import your class
 
 app = Flask(__name__)
 password = os.environ.get("MsSQLPsswd", "")
