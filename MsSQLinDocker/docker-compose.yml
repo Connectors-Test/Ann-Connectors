@@ -1,8 +1,5 @@
 services:
   db:
-    # build:
-    #   context: .
-    #   dockerfile: db.Dockerfile
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: mssql_db
     environment:

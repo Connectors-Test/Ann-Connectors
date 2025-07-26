@@ -1,3 +1,5 @@
+## For Initial Local Testing purpose only
+
 from mssqlConnector import MSSQLConnector
 
 db = MSSQLConnector()  # or your DB name
