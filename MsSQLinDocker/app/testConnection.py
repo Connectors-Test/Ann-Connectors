@@ -1,4 +1,4 @@
-from mssqlConnector import MSSQLConnector
+from MsSQLinDocker.app.mssqlConnector import MSSQLConnector
 
 db = MSSQLConnector()  # or your DB name
 
