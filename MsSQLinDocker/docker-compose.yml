@@ -1,5 +1,8 @@
 services:
   db:
+    # build:
+    #   context: .
+    #   dockerfile: db.Dockerfile
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: mssql_db
     environment:
@@ -10,12 +13,7 @@ services:
     volumes:
       - mssql_data:/var/opt/mssql
       - ./init/init.sql:/init.sql
-    command: >
-      /bin/bash -c "
-      /opt/mssql/bin/sqlservr & 
-      sleep 30 && 
-      /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P ${SA_PASSWD} -i /init.sql
-      "
+    command: /opt/mssql/bin/sqlservr
 
   app:
     build: .
@@ -29,6 +27,11 @@ services:
       MsSQLpassword: ${SA_PASSWD}
     ports:
       - "5000:5000"
+    command: >
+      /bin/bash -c "
+        python3 init_db.py &&
+        python3 main.py
+      "
 
 volumes:
   mssql_data:

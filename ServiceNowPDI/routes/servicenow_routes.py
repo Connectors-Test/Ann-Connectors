@@ -74,3 +74,32 @@ def list_routes():
     }
     route_map = {k: f"/api/{k}" for k in ENDPOINTS}
     return render_template("index.html", grouped=grouped, routes=route_map)
+
+@servicenow_bp.route("/jsonschema/<name>")
+def get_json_schema(name):
+    path = ENDPOINTS.get(name)
+    if not path:
+        return jsonify({"error": "Invalid key"}), 404
+
+    url = f"{BASE}{path}"
+    if '?' not in path:
+        url = f"{url}?sysparm_limit=1"
+    else:
+        url = f"{url}&sysparm_limit=1"
+
+    try:
+        res = requests.get(url, auth=AUTH)
+        data = res.json()
+    except Exception as e:
+        return jsonify({"error": "Failed to fetch or parse response", "details": str(e)}), 500
+
+    result = data.get("result")
+    if isinstance(result, list) and result:
+        sample = result[0]
+    elif isinstance(result, dict):
+        sample = result
+    else:
+        return jsonify({"error": "Unexpected data structure"}), 500
+
+    schema = {k: type(v).__name__ for k, v in sample.items()}
+    return jsonify(schema)

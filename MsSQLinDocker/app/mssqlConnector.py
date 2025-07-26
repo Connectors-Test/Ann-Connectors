@@ -2,18 +2,20 @@ import getpass
 import json
 import pyodbc
 import os
-# from dotenv import load_dotenv
+from dotenv import load_dotenv
 # from sqlalchemy import create_engine
 # import pymssql
 
-# load_dotenv()  
+load_dotenv() 
 
 class MSSQLConnector:
     def __init__(self, server=None, user='sa', password=None, database=None):
         self.server = os.getenv("MsSQLserver", "")
         self.user = user
         self.database = os.environ.get("MsSQLdb", database)
-        self.password = os.environ.get("MsSQLPsswd", password) or getpass.getpass(prompt='Enter MSSQL password: ')
+        self.password = os.environ.get("MsSQLpassword", password)
+        if not self.password:
+            raise ValueError("MsSQLPsswd environment variable not set and no fallback password provided.")
         self.conn = None
         self.cursor = None
         self.connect()
@@ -26,10 +28,12 @@ class MSSQLConnector:
     def connect(self):
         try:
             conn_str = (                                                    #DRIVER METHOD
-                f'DRIVER={{ODBC Driver 17 for SQL Server}};'
+                f'DRIVER={{ODBC Driver 18 for SQL Server}};'
                 f'SERVER={self.server};'
                 f'UID={self.user};'
                 f'PWD={self.password};'
+                f"Encrypt=yes;"
+                f"TrustServerCertificate=yes;"
             )
             if self.database:
                 conn_str += f'DATABASE={self.database};'

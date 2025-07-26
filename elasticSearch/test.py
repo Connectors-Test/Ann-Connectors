@@ -1,13 +1,15 @@
 from flask import Flask, request, jsonify
 from elasticsearch import Elasticsearch
+from dotenv import load_dotenv
 import os
 
+load_dotenv()
 app = Flask(__name__)
 
 # ---- Elastic Cloud Connection ----
-ELASTIC_CLOUD_ID = os.getenv("ELASTIC_CLOUD_ID", "e1446a516aee46c6bac909b53ebadda0:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvJDM4Nzk3M2EwNDc5MjRlZDRhYmEyM2MwMDE0NDU4OTM1JGM4MDJiNWE3Yjk5NDQ5MmZhMWZlNDkzZjIzMDIxNzkz")
-ELASTIC_USERNAME = os.getenv("ELASTIC_USERNAME", "elastic")
-ELASTIC_PASSWORD = os.getenv("ELASTIC_PASSWORD", "zdibjqipdBagZlowZioaFyYW")
+ELASTIC_CLOUD_ID = os.getenv("ELASTIC_CLOUD_ID", "")
+ELASTIC_USERNAME = os.getenv("ELASTIC_USERNAME", "")
+ELASTIC_PASSWORD = os.getenv("ELASTIC_PASSWORD", "")
 
 # Initialize Elasticsearch client
 es = Elasticsearch(

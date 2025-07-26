@@ -11,39 +11,81 @@
     
     <!-- Sidebar Navigation -->
     <div class="bg-white p-6 w-1/3 max-w-md shadow-lg overflow-y-auto space-y-6"> 
-        <div> 
-            <h2 class="text-lg font-bold mb-2">Incident Endpoints</h2> 
-            <ul class="space-y-2 text-blue-600 font-medium"> 
-                <li><button onclick="loadAPI('/api/Incidents', this)">All Incidents</button></li> 
-                <li><button onclick="loadAPI('/api/Specific Incident', this)">Specific Incident</button></li> 
-                <li><button onclick="loadAPI('/api/Incident Count', this)">Incident Count</button></li> 
-            </ul> 
-        </div> 
-        <div> 
-            <h2 class="text-lg font-bold mb-2">User Endpoints</h2> 
-            <ul class="space-y-2 text-blue-600 font-medium"> 
-                <li><button onclick="loadAPI('/api/All Users', this)">All Users</button></li> 
-                <li><button onclick="loadAPI('/api/Active Users', this)">Active Users</button></li> 
-                <li><button onclick="loadAPI('/api/User Count', this)">User Count</button></li> 
-                <li><button onclick="loadAPI('/api/User Meta', this)">User Meta</button></li> 
-            </ul> 
-        </div> 
-        <div> 
-            <h2 class="text-lg font-bold mb-2">Attachment Endpoints</h2> 
-            <ul class="space-y-2 text-blue-600 font-medium"> 
-                <li><button onclick="loadAPI('/api/All Attachments', this)">All Attachments</button></li> 
-                <li><button onclick="loadAPI('/api/Specific Attachment Meta', this)">Specific Attachment Meta</button></li> 
-                <li><button onclick="loadAPI('/api/Specific Attachment File', this)">Specific Attachment File</button></li> 
-            </ul> 
-        </div> 
-        <div> 
-            <h2 class="text-lg font-bold mb-2">Miscellaneous</h2> 
-            <ul class="space-y-2 text-blue-600 font-medium"> 
-                <li><button onclick="loadAPI('/api/Import Table', this)">Import Table</button></li> 
-                <li><button onclick="loadAPI('/api/Catalog Items', this)">Catalog Items</button></li> 
-                <li><button onclick="loadAPI('/api/CMDB CIs', this)">CMDB Items</button></li> 
-            </ul> 
-        </div> 
+      <div> 
+        <h2 class="text-lg font-bold mb-2">Incident Endpoints</h2> 
+        <ul class="space-y-2 text-blue-600 font-medium"> 
+          <li class="flex gap-2">
+            <button onclick="loadAPI('/api/Incidents', this)">All Incidents</button>
+            <a href="/jsonschema/Incidents" target="_blank" class="text-xs text-gray-500 underline">View Schema</a>
+          </li> 
+          <li class="flex gap-2">
+            <button onclick="loadAPI('/api/Specific Incident', this)">Specific Incident</button>
+            <a href="/jsonschema/Specific Incident" target="_blank" class="text-xs text-gray-500 underline">View Schema</a>
+          </li> 
+          <li class="flex gap-2">
+            <button onclick="loadAPI('/api/Incident Count', this)">Incident Count</button>
+            <a href="/jsonschema/Incident Count" target="_blank" class="text-xs text-gray-500 underline">View Schema</a>
+          </li> 
+        </ul> 
+      </div> 
+
+      <div> 
+        <h2 class="text-lg font-bold mb-2">User Endpoints</h2> 
+        <ul class="space-y-2 text-blue-600 font-medium"> 
+          <li class="flex gap-2">
+            <button onclick="loadAPI('/api/All Users', this)">All Users</button>
+            <a href="/jsonschema/All Users" target="_blank" class="text-xs text-gray-500 underline">View Schema</a>
+          </li> 
+          <li class="flex gap-2">
+            <button onclick="loadAPI('/api/Active Users', this)">Active Users</button>
+            <a href="/jsonschema/Active Users" target="_blank" class="text-xs text-gray-500 underline">View Schema</a>
+          </li> 
+          <li class="flex gap-2">
+            <button onclick="loadAPI('/api/User Count', this)">User Count</button>
+            <a href="/jsonschema/User Count" target="_blank" class="text-xs text-gray-500 underline">View Schema</a>
+          </li> 
+          <li class="flex gap-2">
+            <button onclick="loadAPI('/api/User Meta', this)">User Meta</button>
+            <a href="/jsonschema/User Meta" target="_blank" class="text-xs text-gray-500 underline">View Schema</a>
+          </li> 
+        </ul> 
+      </div> 
+
+      <div> 
+        <h2 class="text-lg font-bold mb-2">Attachment Endpoints</h2> 
+        <ul class="space-y-2 text-blue-600 font-medium"> 
+          <li class="flex gap-2">
+            <button onclick="loadAPI('/api/All Attachments', this)">All Attachments</button>
+            <a href="/jsonschema/All Attachments" target="_blank" class="text-xs text-gray-500 underline">View Schema</a>
+          </li> 
+          <li class="flex gap-2">
+            <button onclick="loadAPI('/api/Specific Attachment Meta', this)">Specific Attachment Meta</button>
+            <a href="/jsonschema/Specific Attachment Meta" target="_blank" class="text-xs text-gray-500 underline">View Schema</a>
+          </li> 
+          <li class="flex gap-2">
+            <button onclick="loadAPI('/api/Specific Attachment File', this)">Specific Attachment File</button>
+            <a href="/jsonschema/Specific Attachment File" target="_blank" class="text-xs text-gray-500 underline">View Schema</a>
+          </li> 
+        </ul> 
+      </div> 
+
+      <div> 
+        <h2 class="text-lg font-bold mb-2">Miscellaneous</h2> 
+        <ul class="space-y-2 text-blue-600 font-medium"> 
+          <li class="flex gap-2">
+            <button onclick="loadAPI('/api/Import Table', this)">Import Table</button>
+            <a href="/jsonschema/Import Table" target="_blank" class="text-xs text-gray-500 underline">View Schema</a>
+          </li> 
+          <li class="flex gap-2">
+            <button onclick="loadAPI('/api/Catalog Items', this)">Catalog Items</button>
+            <a href="/jsonschema/Catalog Items" target="_blank" class="text-xs text-gray-500 underline">View Schema</a>
+          </li> 
+          <li class="flex gap-2">
+            <button onclick="loadAPI('/api/CMDB CIs', this)">CMDB Items</button>
+            <a href="/jsonschema/CMDB CIs" target="_blank" class="text-xs text-gray-500 underline">View Schema</a>
+          </li> 
+        </ul> 
+      </div>
     </div>
 
     <!-- Result Panel -->
