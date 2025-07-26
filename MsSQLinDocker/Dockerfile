@@ -22,13 +22,13 @@ RUN curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > mic
     apt-get update && ACCEPT_EULA=Y apt-get install -y msodbcsql17
 
 # Set working directory
-WORKDIR /main
+WORKDIR /app
 
 # Copy code
 COPY . .
 
 # Install Python dependencies
-RUN pip install --no-cache-dir -r app/requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Expose port
 EXPOSE 5000
