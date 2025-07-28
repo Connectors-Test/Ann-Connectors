@@ -77,7 +77,9 @@
 
     <!-- Result Panel -->
     <div class="flex flex-col gap-2">
-      <a id="schema-link" href="#" target="_blank" class="hidden text-sm text-blue-500 underline">🔍 View Schema for This Endpoint</a>
+      <button id="schema-toggle" onclick="toggleSchema()" class="hidden text-sm text-blue-500 underline w-fit">
+        🔍 Show Schema
+      </button>
       <div id="output" class="whitespace-pre-wrap font-mono text-sm"></div>
     </div>
   </div>
@@ -120,9 +122,14 @@
     async function loadAPI(endpoint, btn) {
       // UI feedback
       const output = document.getElementById('output');
-      const schemaLink = document.getElementById('schema-link');
+      const schemaToggle = document.getElementById('schema-toggle');
 
-      // Highlight active button
+      // Reset schema state
+      showingSchema = false;
+      schemaToggle.classList.add("hidden");
+      schemaToggle.textContent = "🔍 Show Schema";
+
+      // Highlight button
       document.querySelectorAll("button").forEach(b => {
         b.classList.remove("underline", "text-black");
         b.classList.add("text-blue-600");
@@ -136,19 +143,52 @@
           const blob = await res.blob();
           const imgURL = URL.createObjectURL(blob);
           output.innerHTML = `<img src="${imgURL}" alt="Downloaded Image" class="max-w-full border rounded shadow" />`;
-          schemaLink.classList.add("hidden");
+          lastEndpoint = null;
+          lastData = null;
         } else {
           const res = await fetch(endpoint);
           const data = await res.json();
-          output.textContent = JSON.stringify(data, null, 2);
+          const pretty = JSON.stringify(data, null, 2);
+          output.textContent = pretty;
 
-          const name = decodeURIComponent(endpoint.replace('/api/', '').split('?')[0]);
-          schemaLink.href = "/jsonschema/" + name;
-          schemaLink.classList.remove("hidden");
+          // Save for schema toggle
+          lastData = pretty;
+          lastEndpoint = decodeURIComponent(endpoint.replace('/api/', '').split('?')[0]);
+          schemaToggle.classList.remove("hidden");
         }
       } catch (err) {
         output.textContent = 'Error fetching: ' + err;
-        schemaLink.classList.add("hidden");
+        schemaToggle.classList.add("hidden");
+        lastEndpoint = null;
+        lastData = null;
+      }
+    }
+
+    let lastEndpoint = null;
+    let lastData = null;
+    let showingSchema = false;
+
+    async function toggleSchema() {
+      const btn = document.getElementById("schema-toggle");
+      const output = document.getElementById("output");
+
+      if (!lastEndpoint || !lastData) return;
+
+      if (showingSchema) {
+        output.textContent = lastData;
+        btn.textContent = "🔍 Show Schema";
+        showingSchema = false;
+      } else {
+        try {
+          const schemaRes = await fetch('/jsonschema/' + encodeURIComponent(lastEndpoint));
+          const schemaData = await schemaRes.json();
+          output.textContent = JSON.stringify(schemaData, null, 2);
+          btn.textContent = "📄 Show Response";
+          showingSchema = true;
+        } catch (err) {
+          output.textContent = 'Error fetching schema: ' + err;
+          showingSchema = false;
+        }
       }
     }
   </script>
