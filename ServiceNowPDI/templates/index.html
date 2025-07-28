@@ -16,15 +16,12 @@
         <ul class="space-y-2 text-blue-600 font-medium"> 
           <li class="flex gap-2">
             <button onclick="loadAPI('/api/Incidents', this)">All Incidents</button>
-            <a href="/jsonschema/Incidents" target="_blank" class="text-xs text-gray-500 underline">View Schema</a>
           </li> 
           <li class="flex gap-2">
             <button onclick="loadAPI('/api/Specific Incident', this)">Specific Incident</button>
-            <a href="/jsonschema/Specific Incident" target="_blank" class="text-xs text-gray-500 underline">View Schema</a>
           </li> 
           <li class="flex gap-2">
             <button onclick="loadAPI('/api/Incident Count', this)">Incident Count</button>
-            <a href="/jsonschema/Incident Count" target="_blank" class="text-xs text-gray-500 underline">View Schema</a>
           </li> 
         </ul> 
       </div> 
@@ -34,19 +31,15 @@
         <ul class="space-y-2 text-blue-600 font-medium"> 
           <li class="flex gap-2">
             <button onclick="loadAPI('/api/All Users', this)">All Users</button>
-            <a href="/jsonschema/All Users" target="_blank" class="text-xs text-gray-500 underline">View Schema</a>
           </li> 
           <li class="flex gap-2">
             <button onclick="loadAPI('/api/Active Users', this)">Active Users</button>
-            <a href="/jsonschema/Active Users" target="_blank" class="text-xs text-gray-500 underline">View Schema</a>
           </li> 
           <li class="flex gap-2">
             <button onclick="loadAPI('/api/User Count', this)">User Count</button>
-            <a href="/jsonschema/User Count" target="_blank" class="text-xs text-gray-500 underline">View Schema</a>
           </li> 
           <li class="flex gap-2">
             <button onclick="loadAPI('/api/User Meta', this)">User Meta</button>
-            <a href="/jsonschema/User Meta" target="_blank" class="text-xs text-gray-500 underline">View Schema</a>
           </li> 
         </ul> 
       </div> 
@@ -56,15 +49,12 @@
         <ul class="space-y-2 text-blue-600 font-medium"> 
           <li class="flex gap-2">
             <button onclick="loadAPI('/api/All Attachments', this)">All Attachments</button>
-            <a href="/jsonschema/All Attachments" target="_blank" class="text-xs text-gray-500 underline">View Schema</a>
           </li> 
           <li class="flex gap-2">
             <button onclick="loadAPI('/api/Specific Attachment Meta', this)">Specific Attachment Meta</button>
-            <a href="/jsonschema/Specific Attachment Meta" target="_blank" class="text-xs text-gray-500 underline">View Schema</a>
           </li> 
           <li class="flex gap-2">
             <button onclick="loadAPI('/api/Specific Attachment File', this)">Specific Attachment File</button>
-            <a href="/jsonschema/Specific Attachment File" target="_blank" class="text-xs text-gray-500 underline">View Schema</a>
           </li> 
         </ul> 
       </div> 
@@ -74,22 +64,20 @@
         <ul class="space-y-2 text-blue-600 font-medium"> 
           <li class="flex gap-2">
             <button onclick="loadAPI('/api/Import Table', this)">Import Table</button>
-            <a href="/jsonschema/Import Table" target="_blank" class="text-xs text-gray-500 underline">View Schema</a>
           </li> 
           <li class="flex gap-2">
             <button onclick="loadAPI('/api/Catalog Items', this)">Catalog Items</button>
-            <a href="/jsonschema/Catalog Items" target="_blank" class="text-xs text-gray-500 underline">View Schema</a>
           </li> 
           <li class="flex gap-2">
             <button onclick="loadAPI('/api/CMDB CIs', this)">CMDB Items</button>
-            <a href="/jsonschema/CMDB CIs" target="_blank" class="text-xs text-gray-500 underline">View Schema</a>
           </li> 
         </ul> 
       </div>
     </div>
 
     <!-- Result Panel -->
-    <div class="flex-1 bg-gray-50 p-6 overflow-y-auto">
+    <div class="flex flex-col gap-2">
+      <a id="schema-link" href="#" target="_blank" class="hidden text-sm text-blue-500 underline">🔍 View Schema for This Endpoint</a>
       <div id="output" class="whitespace-pre-wrap font-mono text-sm"></div>
     </div>
   </div>
@@ -131,6 +119,10 @@
     // }
     async function loadAPI(endpoint, btn) {
       // UI feedback
+      const output = document.getElementById('output');
+      const schemaLink = document.getElementById('schema-link');
+
+      // Highlight active button
       document.querySelectorAll("button").forEach(b => {
         b.classList.remove("underline", "text-black");
         b.classList.add("text-blue-600");
@@ -139,18 +131,24 @@
       btn.classList.add("text-black", "underline");
 
       try {
-        // If endpoint includes 'file', treat it as image
         if (endpoint.includes('/file')) {
-            const res = await fetch(endpoint);
-            const blob = await res.blob();
-            const imgURL = URL.createObjectURL(blob);
-            output.innerHTML = `<img src="${imgURL}" alt="Downloaded Image" class="max-w-full border rounded shadow" />`;
+          const res = await fetch(endpoint);
+          const blob = await res.blob();
+          const imgURL = URL.createObjectURL(blob);
+          output.innerHTML = `<img src="${imgURL}" alt="Downloaded Image" class="max-w-full border rounded shadow" />`;
+          schemaLink.classList.add("hidden");
         } else {
-            const res = await fetch(endpoint);
-            const data = await res.json();
-            document.getElementById('output').textContent = JSON.stringify(data, null, 2);}
+          const res = await fetch(endpoint);
+          const data = await res.json();
+          output.textContent = JSON.stringify(data, null, 2);
+
+          const name = decodeURIComponent(endpoint.replace('/api/', '').split('?')[0]);
+          schemaLink.href = "/jsonschema/" + name;
+          schemaLink.classList.remove("hidden");
+        }
       } catch (err) {
-        document.getElementById('output').textContent = 'Error fetching: ' + err;
+        output.textContent = 'Error fetching: ' + err;
+        schemaLink.classList.add("hidden");
       }
     }
   </script>
