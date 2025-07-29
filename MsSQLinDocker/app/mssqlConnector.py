@@ -29,7 +29,7 @@ class MSSQLConnector:
         try:
             conn_str = (                                                    #DRIVER METHOD
                 f'DRIVER={{ODBC Driver 18 for SQL Server}};'
-                f'SERVER={self.server};'
+                f'SERVER={self.server},1433;'
                 f'UID={self.user};'
                 f'PWD={self.password};'
                 f"Encrypt=yes;"
