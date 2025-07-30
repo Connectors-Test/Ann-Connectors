@@ -19,6 +19,16 @@ app.get("/contacts", async (req, res) => {
   res.json(r.data);
 });
 
+// ✅ Create contact
+app.post("/contacts", async (req, res) => {
+  try {
+    const r = await axios.post(`${BASE_URL}/contacts`, req.body, { auth });
+    res.json(r.data);
+  } catch (err) {
+    res.status(err.response?.status || 500).json(err.response?.data || { error: "Unknown error" });
+  }
+});
+
 // 🧾 Get all tickets
 app.get("/tickets", async (req, res) => {
   const r = await axios.get(`${BASE_URL}/tickets`, { auth });
@@ -27,8 +37,28 @@ app.get("/tickets", async (req, res) => {
 
 // ✅ Create ticket
 app.post("/tickets", async (req, res) => {
-  const r = await axios.post(`${BASE_URL}/tickets`, req.body, { auth });
-  res.json(r.data);
+  try {
+    const payload = {
+      subject: req.body.subject,
+      description: req.body.description,
+      email: req.body.email,
+      priority: 1,
+      status: 2
+    };
+
+    console.log("➡️ Outgoing ticket payload:", payload);
+
+    const r = await axios.post(`${BASE_URL}/tickets`, payload, {
+      auth,
+      headers: { "Content-Type": "application/json" }
+    });
+
+    res.json(r.data);
+  } catch (err) {
+    const errorMsg = err.response?.data || { error: "Unknown error" };
+    console.error("❌ Ticket creation failed:", errorMsg);
+    res.status(err.response?.status || 500).json(errorMsg);
+  }
 });
 
 // 💬 Add ticket note
@@ -54,6 +84,27 @@ app.get("/solutions/categories", async (req, res) => {
   res.json(r.data);
 });
 
+// ✅ Create solution category
+app.post("/solutions/categories", async (req, res) => {
+  try {
+    const r = await axios.post(`${BASE_URL}/solutions/categories`, req.body, { auth });
+    res.json(r.data);
+  } catch (err) {
+    res.status(err.response?.status || 500).json(err.response?.data || { error: "Unknown error" });
+  }
+});
+
+// 💬 Get conversations for a ticket
+app.get("/tickets/:id/conversations", async (req, res) => {
+  const ticketId = req.params.id;
+  try {
+    const r = await axios.get(`${BASE_URL}/tickets/${ticketId}/conversations`, { auth });
+    res.json(r.data);
+  } catch (err) {
+    res.status(err.response?.status || 500).json(err.response?.data || { error: "Unknown error" });
+  }
+});
+
 // 🔍 Search tickets or contacts
 app.get("/search", async (req, res) => {
   const { type, query } = req.query;
@@ -62,11 +113,18 @@ app.get("/search", async (req, res) => {
     return res.status(400).json({ error: "Missing type or query" });
   }
 
-  const r = await axios.get(
-    `${BASE_URL}/search/${type}?query="${query}"`,
-    { auth }
-  );
-  res.json(r.data);
+  console.log("➡️ SEARCH QUERY:", `${BASE_URL}/search/${type}?query=${query}`);
+
+  try {
+    const r = await axios.get(
+      `${BASE_URL}/search/${type}?query="${query}"`,
+      { auth }
+    );
+    res.json(r.data);
+  } catch (err) {
+    console.error("❌ Search failed:", err.response?.data || err.message);
+    res.status(err.response?.status || 500).json(err.response?.data || { error: "Search failed" });
+  }
 });
 
 // Server status

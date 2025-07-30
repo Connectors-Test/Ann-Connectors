@@ -5,47 +5,51 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Freshdesk Admin Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="./dist/output.css" rel="stylesheet" />
 </head>
-<body class="bg-gray-100 text-gray-800">
+<body class="bg-gray-50 text-gray-800">
   <div class="flex h-screen">
-    
+
     <!-- Sidebar -->
-    <aside class="w-64 bg-white shadow-md p-4 flex flex-col sticky top-0 h-screen">
-      <h2 class="text-xl font-bold mb-6">📋 Dashboard</h2>
-      <nav class="flex flex-col gap-2">
-        <button class="nav-btn" data-page="tickets">🎫 Tickets</button>
-        <button class="nav-btn" data-page="contacts">👤 Contacts</button>
-        <button class="nav-btn" data-page="companies">🏢 Companies</button>
-        <button class="nav-btn" data-page="categories">📚 Solutions</button>
-        <button class="nav-btn" data-page="conversations">💬 Conversations</button>
+    <aside class="w-64 bg-white shadow-md p-6 flex flex-col sticky top-0 h-screen border-r border-gray-200">
+      <h2 class="text-2xl font-bold text-blue-600 mb-8">Dashboard</h2>
+      <nav class="flex flex-col gap-3">
+        <button class="nav-btn text-left text-gray-700 hover:text-blue-600 font-medium" data-page="tickets">Tickets</button>
+        <button class="nav-btn text-left text-gray-700 hover:text-blue-600 font-medium" data-page="contacts">Contacts</button>
+        <button class="nav-btn text-left text-gray-700 hover:text-blue-600 font-medium" data-page="companies">Companies</button>
+        <button class="nav-btn text-left text-gray-700 hover:text-blue-600 font-medium" data-page="categories">Solutions</button>
+        <button class="nav-btn text-left text-gray-700 hover:text-blue-600 font-medium" data-page="conversations">Conversations</button>
       </nav>
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 p-6 overflow-y-auto">
+    <main class="flex-1 p-8 overflow-y-auto">
       <!-- Header -->
-      <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold">Freshdesk Admin Panel</h1>
-        <div class="flex gap-2">
-          <select id="search-type" class="border px-2 py-1">
+      <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">Freshdesk Admin Panel</h1>
+        <div class="flex gap-2 items-center">
+          <select id="search-type" class="border border-gray-300 rounded px-3 py-2 text-sm">
             <option value="tickets">Tickets</option>
             <option value="contacts">Contacts</option>
+          </select>
+          <select id="search-field" class="border border-gray-300 rounded px-3 py-2 text-sm">
+            <!-- Options change dynamically in JS -->
           </select>
           <input
             id="search-input"
             type="text"
-            class="border px-2 py-1"
+            class="border border-gray-300 rounded px-3 py-2 text-sm w-30"
             placeholder="Search..."
           />
           <button
             id="search-btn"
-            class="bg-blue-500 text-white px-4 py-1 rounded"
+            class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded"
           >Search</button>
         </div>
       </div>
 
       <!-- Dynamic content goes here -->
-      <div id="content-area" class="space-y-4"></div>
+      <div id="content-area" class="space-y-6"></div>
     </main>
   </div>
 

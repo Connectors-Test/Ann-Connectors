@@ -1,30 +1,3 @@
-
-
-export async function loadSolutionCategories(container) {
-  container.innerHTML = "";
-
-  const header = document.createElement("div");
-  header.className = "mb-4";
-  header.innerHTML = `<h2 class="text-xl font-semibold">📚 Solution Categories</h2>`;
-  container.appendChild(header);
-
-  try {
-    const res = await fetch(`${API_BASE}/solutions/categories`);
-    const categories = await res.json();
-    const list = document.createElement("ul");
-    list.className = "bg-white p-4 rounded shadow space-y-2 text-sm";
-
-    categories.forEach((c) => {
-      const li = document.createElement("li");
-      li.innerText = c.name;
-      list.appendChild(li);
-    });
-
-    container.appendChild(list);
-  } catch (err) {
-    container.innerHTML += `<p class="text-red-600">Error loading categories</p>`;
-  }
-}
 // js/modules/solutionCategories.js
 const API_BASE = "http://localhost:3001";
 
