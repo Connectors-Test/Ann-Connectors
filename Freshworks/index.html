@@ -1,84 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Freshdesk Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      window.API_BASE = "http://localhost:3001";
-    </script>
-    <script defer src="script.js"></script>
-  </head>
-  <body class="bg-gray-100 text-gray-900 font-sans">
-    <div class="min-h-screen flex">
-      <!-- Sidebar -->
-      <aside class="w-64 bg-white shadow-lg p-6 hidden md:block">
-        <h2 class="text-xl font-bold mb-6">📋 Dashboard</h2>
-        <nav class="space-y-2">
-          <a href="#tickets" class="block text-blue-600 hover:underline">🎫 Tickets</a>
-          <a href="#contacts" class="block text-blue-600 hover:underline">👤 Contacts</a>
-          <a href="#companies" class="block text-blue-600 hover:underline">🏢 Companies</a>
-          <a href="#categories" class="block text-blue-600 hover:underline">📚 Categories</a>
-          <a href="#search" class="block text-blue-600 hover:underline">🔍 Search</a>
-        </nav>
-      </aside>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Freshdesk Admin Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800">
+  <div class="flex h-screen">
+    
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white shadow-md p-4 flex flex-col sticky top-0 h-screen">
+      <h2 class="text-xl font-bold mb-6">📋 Dashboard</h2>
+      <nav class="flex flex-col gap-2">
+        <button class="nav-btn" data-page="tickets">🎫 Tickets</button>
+        <button class="nav-btn" data-page="contacts">👤 Contacts</button>
+        <button class="nav-btn" data-page="companies">🏢 Companies</button>
+        <button class="nav-btn" data-page="categories">📚 Solutions</button>
+        <button class="nav-btn" data-page="conversations">💬 Conversations</button>
+      </nav>
+    </aside>
 
-      <!-- Main content -->
-      <main class="flex-1 p-6">
-        <header class="mb-8">
-          <h1 class="text-3xl font-bold">Freshdesk Admin Portal</h1>
-          <p class="text-gray-500">Manage Tickets, Contacts, and More</p>
-        </header>
+    <!-- Main Content -->
+    <main class="flex-1 p-6 overflow-y-auto">
+      <!-- Header -->
+      <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold">Freshdesk Admin Panel</h1>
+        <div class="flex gap-2">
+          <select id="search-type" class="border px-2 py-1">
+            <option value="tickets">Tickets</option>
+            <option value="contacts">Contacts</option>
+          </select>
+          <input
+            id="search-input"
+            type="text"
+            class="border px-2 py-1"
+            placeholder="Search..."
+          />
+          <button
+            id="search-btn"
+            class="bg-blue-500 text-white px-4 py-1 rounded"
+          >Search</button>
+        </div>
+      </div>
 
-        <!-- Search -->
-        <section id="search" class="mb-10 bg-white rounded-lg shadow p-6">
-          <h2 class="text-xl font-semibold mb-4">🔍 Search</h2>
-          <div class="flex flex-col md:flex-row gap-4">
-            <select id="search-type" class="border rounded px-3 py-2">
-              <option value="tickets">Tickets</option>
-              <option value="contacts">Contacts</option>
-            </select>
-            <input
-              id="search-query"
-              class="border rounded px-3 py-2 flex-1"
-              type="text"
-              placeholder="query like email:'@example.com'"
-            />
-            <button
-              onclick="handleSearch()"
-              class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-            >
-              Search
-            </button>
-          </div>
-          <ul id="search-results" class="mt-4 text-sm list-disc list-inside text-gray-700"></ul>
-        </section>
+      <!-- Dynamic content goes here -->
+      <div id="content-area" class="space-y-4"></div>
+    </main>
+  </div>
 
-        <!-- Tickets -->
-        <section id="tickets" class="mb-10 bg-white rounded-lg shadow p-6">
-          <h2 class="text-xl font-semibold mb-4">🎫 Tickets</h2>
-          <ul class="space-y-2 text-sm text-gray-700" id="tickets"></ul>
-        </section>
-
-        <!-- Contacts -->
-        <section id="contacts" class="mb-10 bg-white rounded-lg shadow p-6">
-          <h2 class="text-xl font-semibold mb-4">👤 Contacts</h2>
-          <ul class="space-y-2 text-sm text-gray-700" id="contacts"></ul>
-        </section>
-
-        <!-- Companies -->
-        <section id="companies" class="mb-10 bg-white rounded-lg shadow p-6">
-          <h2 class="text-xl font-semibold mb-4">🏢 Companies</h2>
-          <ul class="space-y-2 text-sm text-gray-700" id="companies"></ul>
-        </section>
-
-        <!-- Categories -->
-        <section id="categories" class="mb-10 bg-white rounded-lg shadow p-6">
-          <h2 class="text-xl font-semibold mb-4">📚 Solution Categories</h2>
-          <ul class="space-y-2 text-sm text-gray-700" id="categories"></ul>
-        </section>
-      </main>
-    </div>
-  </body>
+  <script type="module" src="js/main.js"></script>
+</body>
 </html>
