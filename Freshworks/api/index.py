@@ -16,6 +16,25 @@ HEADERS = {"Content-Type": "application/json"}
 def home():
     return jsonify({"message": "Freshdesk API Flask on Vercel!"})
 
+@app.route('/auth', methods=['GET'])
+def test_auth():
+    url = f"https://{FRESHDESK_DOMAIN}/api/v2/agents/me"
+
+    try:
+        response = requests.get(url, auth=HTTPBasicAuth(API_KEY, 'x'), headers=HEADERS)
+        response.raise_for_status()
+        data = response.json()
+        return jsonify({
+            "status": "success",
+            "your_name": data.get("contact", {}).get("name", "N/A"),
+            "email": data.get("contact", {}).get("email", "N/A")
+        }), 200
+    except requests.exceptions.RequestException as e:
+        return jsonify({
+            "status": "fail",
+            "error": str(e)
+        }), 401
+
 @app.route('/contacts', methods=['GET'])
 def list_contacts():
     url = f"https://{FRESHDESK_DOMAIN}/api/v2/contacts"
