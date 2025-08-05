@@ -50,7 +50,7 @@ def get_schema(producttype, subproducttype):
     headers = {"APIKey": SAP_API_KEY}
     r = requests.get(metadata_url, headers=headers)
     try:
-        schema_json = xmltodict.parse(r.text)
+        schema_json = xmltodict.parse(r.text)         ## Converts XML to JSON, if XML is okay then refer code till commit "make authorized"
         return jsonify(schema_json), r.status_code
     except Exception as e:
         return jsonify({"error": "XML parsing failed", "message": str(e)}), 500
