@@ -2,10 +2,8 @@ from flask import Flask, request, jsonify
 import os, json, requests
 import google.generativeai as genai
 from dotenv import load_dotenv
-from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)
 
 # Load env variables
 load_dotenv()
@@ -102,3 +100,5 @@ def gemini_generate():
         })
     except Exception as e:
         return jsonify({"error": str(e)}), 400
+    
+application = app
