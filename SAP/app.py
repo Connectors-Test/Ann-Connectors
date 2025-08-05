@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 import requests, os
 from dotenv import load_dotenv
+import xmltodict
 
 app = Flask(__name__)
 load_dotenv()
@@ -48,7 +49,11 @@ def get_schema(producttype, subproducttype):
     metadata_url = base_url.rstrip("/") + "/$metadata"
     headers = {"APIKey": SAP_API_KEY}
     r = requests.get(metadata_url, headers=headers)
-    return jsonify({"schema_xml": r.text}), r.status_code
+    try:
+        schema_json = xmltodict.parse(r.text)
+        return jsonify(schema_json), r.status_code
+    except Exception as e:
+        return jsonify({"error": "XML parsing failed", "message": str(e)}), 500
 
 @app.route("/api/listsubtypes/<producttype>", methods=["GET"])
 def list_subtypes(producttype):
