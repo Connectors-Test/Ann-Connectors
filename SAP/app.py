@@ -19,11 +19,6 @@ SAP_ENDPOINTS = {
     # Add more categories
 }
 
-# Auth check
-def check_auth():
-    apikey = request.args.get("apikey")
-    return apikey == SAP_API_KEY
-
 @app.route("/")
 def home():
     return jsonify({"status": "SAP Flask API is running"})
@@ -31,8 +26,6 @@ def home():
 @app.route("/api/data/<producttype>/<subproducttype>", methods=["GET"])
 @app.route("/api/data/<producttype>/<subproducttype>/<field>", methods=["GET"])
 def get_data(producttype, subproducttype, field=None):
-    if not check_auth():
-        return jsonify({"error": "Unauthorized"}), 401
 
     base_url = SAP_ENDPOINTS.get(producttype, {}).get(subproducttype)
     if not base_url:
@@ -47,8 +40,6 @@ def get_data(producttype, subproducttype, field=None):
 
 @app.route("/api/schema/<producttype>/<subproducttype>", methods=["GET"])
 def get_schema(producttype, subproducttype):
-    if not check_auth():
-        return jsonify({"error": "Unauthorized"}), 401
 
     base_url = SAP_ENDPOINTS.get(producttype, {}).get(subproducttype)
     if not base_url:
@@ -61,8 +52,6 @@ def get_schema(producttype, subproducttype):
 
 @app.route("/api/listsubtypes/<producttype>", methods=["GET"])
 def list_subtypes(producttype):
-    if not check_auth():
-        return jsonify({"error": "Unauthorized"}), 401
 
     subtypes = list(SAP_ENDPOINTS.get(producttype, {}).keys())
     return jsonify({"subproducttypes": subtypes})
