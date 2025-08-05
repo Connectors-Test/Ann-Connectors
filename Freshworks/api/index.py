@@ -12,6 +12,10 @@ FRESHDESK_DOMAIN = os.getenv("FRESHDESK_DOMAIN", "")
 API_KEY = os.getenv("API_KEY", "")
 HEADERS = {"Content-Type": "application/json"}
 
+@app.route('/')
+def home():
+    return jsonify({"message": "Freshdesk API Flask on Vercel!"})
+
 # ✅ Auth test
 @app.route('/auth', methods=['GET'])
 def test_auth():
