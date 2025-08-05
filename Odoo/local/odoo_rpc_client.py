@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-ODOO_URL = os.getenv("ODOO_URL", "http://localhost:8069/jsonrpc")
+ODOO_URL = os.getenv("ODOO_LOCAL_URL", "http://localhost:8069/jsonrpc")
 DB = os.getenv("ODOO_DB", "SCAI")
 USER = os.getenv("ODOO_EMAIL", "")
 PASSWORD = os.getenv("ODOO_PASS", "")
