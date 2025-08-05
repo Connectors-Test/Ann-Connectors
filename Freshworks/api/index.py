@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify
 import requests
 from requests.auth import HTTPBasicAuth
 import os
@@ -12,62 +12,57 @@ FRESHDESK_DOMAIN = os.getenv("FRESHDESK_DOMAIN", "")
 API_KEY = os.getenv("API_KEY", "")
 HEADERS = {"Content-Type": "application/json"}
 
-@app.route('/')
-def home():
-    return jsonify({"message": "Freshdesk API Flask on Vercel!"})
-
+# ✅ Auth test
 @app.route('/auth', methods=['GET'])
 def test_auth():
     url = f"https://{FRESHDESK_DOMAIN}/api/v2/agents/me"
-
     try:
-        response = requests.get(url, auth=HTTPBasicAuth(API_KEY, 'x'), headers=HEADERS)
-        response.raise_for_status()
-        data = response.json()
-        return jsonify({
-            "status": "success",
-            "your_name": data.get("contact", {}).get("name", "N/A"),
-            "email": data.get("contact", {}).get("email", "N/A")
-        }), 200
-    except requests.exceptions.RequestException as e:
-        return jsonify({
-            "status": "fail",
-            "error": str(e)
-        }), 401
+        r = requests.get(url, auth=HTTPBasicAuth(API_KEY, 'x'), headers=HEADERS)
+        r.raise_for_status()
+        data = r.json()
+        return jsonify({"status": "success", "name": data.get("contact", {}).get("name")}), 200
+    except Exception as e:
+        return jsonify({"status": "fail", "error": str(e)}), 401
 
+# ✅ Basic GET endpoints
 @app.route('/contacts', methods=['GET'])
-def list_contacts():
+def get_contacts():
     url = f"https://{FRESHDESK_DOMAIN}/api/v2/contacts"
     r = requests.get(url, auth=HTTPBasicAuth(API_KEY, 'x'), headers=HEADERS)
     return jsonify(r.json()), r.status_code
 
-@app.route('/create-ticket', methods=['POST'])
-def create_ticket():
-    data = {
-        "description": "Test ticket from API",
-        "subject": "API Test",
-        "email": "demo.user@example.com",
-        "priority": 1,
-        "status": 2
-    }
+@app.route('/tickets', methods=['GET'])
+def get_tickets():
     url = f"https://{FRESHDESK_DOMAIN}/api/v2/tickets"
-    r = requests.post(url, auth=HTTPBasicAuth(API_KEY, 'x'), headers=HEADERS, json=data)
-    return jsonify(r.json()), r.status_code
-
-@app.route('/add-note/<int:ticket_id>', methods=['POST'])
-def add_note(ticket_id):
-    url = f"https://{FRESHDESK_DOMAIN}/api/v2/tickets/{ticket_id}/notes"
-    data = {"body": "This is a note added via API", "private": True}
-    r = requests.post(url, auth=HTTPBasicAuth(API_KEY, 'x'), headers=HEADERS, json=data)
-    return jsonify(r.json()), r.status_code
-
-@app.route('/archived-ticket/<int:ticket_id>', methods=['GET'])
-def archived_ticket(ticket_id):
-    url = f"https://{FRESHDESK_DOMAIN}/api/v2/tickets/archived/{ticket_id}"
     r = requests.get(url, auth=HTTPBasicAuth(API_KEY, 'x'), headers=HEADERS)
     return jsonify(r.json()), r.status_code
 
-@app.route('/schema/<endpoint>', methods=['GET'])
+@app.route('/ticket/<int:ticket_id>', methods=['GET'])
+def get_single_ticket(ticket_id):
+    url = f"https://{FRESHDESK_DOMAIN}/api/v2/tickets/{ticket_id}"
+    r = requests.get(url, auth=HTTPBasicAuth(API_KEY, 'x'), headers=HEADERS)
+    return jsonify(r.json()), r.status_code
+
+@app.route('/agents', methods=['GET'])
+def get_agents():
+    url = f"https://{FRESHDESK_DOMAIN}/api/v2/agents"
+    r = requests.get(url, auth=HTTPBasicAuth(API_KEY, 'x'), headers=HEADERS)
+    return jsonify(r.json()), r.status_code
+
+@app.route('/groups', methods=['GET'])
+def get_groups():
+    url = f"https://{FRESHDESK_DOMAIN}/api/v2/groups"
+    r = requests.get(url, auth=HTTPBasicAuth(API_KEY, 'x'), headers=HEADERS)
+    return jsonify(r.json()), r.status_code
+
+@app.route('/companies', methods=['GET'])
+def get_companies():
+    url = f"https://{FRESHDESK_DOMAIN}/api/v2/companies"
+    r = requests.get(url, auth=HTTPBasicAuth(API_KEY, 'x'), headers=HEADERS)
+    return jsonify(r.json()), r.status_code
+
+# ✅ Schema guesser
+@app.route('/schema/<path:endpoint>', methods=['GET'])
 def get_schema(endpoint):
     url = f"https://{FRESHDESK_DOMAIN}/api/v2/{endpoint}"
     r = requests.get(url, auth=HTTPBasicAuth(API_KEY, 'x'), headers=HEADERS)
@@ -76,7 +71,6 @@ def get_schema(endpoint):
 
     data = r.json()
     schema = {}
-
     if isinstance(data, list) and data:
         for key, value in data[0].items():
             schema[key] = type(value).__name__
@@ -88,17 +82,16 @@ def get_schema(endpoint):
 
     return jsonify(schema), 200
 
-@app.route('/list-subtypes/<endpoint>', methods=['GET'])
+# ✅ List subtypes (index generator)
+@app.route('/list-subtypes/<path:endpoint>', methods=['GET'])
 def list_subtypes(endpoint):
     url = f"https://{FRESHDESK_DOMAIN}/api/v2/{endpoint}"
     try:
-        response = requests.get(url, auth=HTTPBasicAuth(API_KEY, 'x'), headers=HEADERS)
-        response.raise_for_status()
-        data = response.json()
-
+        r = requests.get(url, auth=HTTPBasicAuth(API_KEY, 'x'), headers=HEADERS)
+        r.raise_for_status()
+        data = r.json()
         if isinstance(data, list):
-            indices = list(range(len(data)))
-            return jsonify({"indices": indices}), 200
+            return jsonify({"indices": list(range(len(data)))}), 200
         else:
             return jsonify({"indices": []}), 200
     except Exception as e:
