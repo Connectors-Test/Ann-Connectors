@@ -92,3 +92,5 @@ def auth_check():
             "error": "Exception during auth check",
             "message": str(e)
         }), 500
+
+application = app
