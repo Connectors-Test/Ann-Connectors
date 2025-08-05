@@ -16,4 +16,4 @@ Run `api/index.py` or test using my already deployed https://smart-card-ai-ashy.
 
 ### For testing the demo web app  
 Step 1: Run the server — `node <path to folder>/web/server.js` in terminal (assuming node is already installed)  
-Step 2: Run the frontend — either locally by opening `index.html`, or go to https://scai-freshdesks.vercel.app/
+Step 2: Run the frontend — either locally by opening `index.html`, or go to[ https://scai-freshdesks.vercel.app/](http://smart-card-ai-3oob.vercel.app/)
