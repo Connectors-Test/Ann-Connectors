@@ -15,14 +15,16 @@ You can do it similar to my `/LLMtoQuery/Odoo/add_data.py` in Repo root
 
 ### .env structure:
 For local odoo:  
-`ODOO_LOCAL_URL=http://localhost:8069/jsonrpc`  
-`ODOO_DB=<your db name>`  
-`ODOO_EMAIL=<your email>@gmail.com`  
-`ODOO_PASS=<suiii>`  
+```env
+ODOO_LOCAL_URL=http://localhost:8069/jsonrpc  
+ODOO_DB=<your db name>  
+ODOO_EMAIL=<your email>@gmail.com  
+ODOO_PASS=<suiii>  ```
 For odoo online and gemini to query assistance:  
-`GEMINI_API_KEY=blahblahblah`  
-`ODOO_URL=https://<your_domain>.odoo.com`  
-`ODOO_KEY="blahbluh"`
+```env
+GEMINI_API_KEY=blahblahblah  
+ODOO_URL=https://<your_domain>.odoo.com  
+ODOO_KEY="blahbluh" ```
 
 ### Available Endpoints
 - `/`                         : Health check  

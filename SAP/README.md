@@ -7,8 +7,9 @@ Run `app.py` or test using my already deployed https://scai-sap.vercel.app/
 run `/LLMtoQuery/SAP/main.py` from Repo root
 
 ### .env structure: 
-`GEMINI_API_KEY=blahblah`  
-`SAP_SANDBOX_APIKEY=blacksheephaveyouanywool`  
+```env
+GEMINI_API_KEY=blahblah  
+SAP_SANDBOX_APIKEY=blacksheephaveyouanywool  ```
 
 ### Available Endpoints
 - `/`                         : Health check  

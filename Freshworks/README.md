@@ -5,8 +5,9 @@ Hey,
 This only connects to freshdesk, a freshworks app
 
 ### .env structure:
-`FRESHDESK_DOMAIN = "<your domain>.freshdesk.com"`  
-`API_KEY = <your api key>`
+```env
+FRESHDESK_DOMAIN = "<your domain>.freshdesk.com"  
+API_KEY = <your api key>```
 
 ### For testing api locally (Not required)  
 Run `main.py`
