@@ -43,12 +43,7 @@ def fetch_google_sheet_data(sheetsID, sheetName, query):
                 values.append(cell['v'] if cell else None)
             rows.append(dict(zip(headers, values)))
 
-        return {
-            "success": True,
-            "message": "Retrieved spreadsheet data via gviz",
-            "data": rows,
-            "statusCode": 200
-        }
+        return rows
 
     except Exception as e:
         return {
