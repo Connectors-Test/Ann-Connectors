@@ -19,9 +19,9 @@ Step 1: Run the server — `node <path to folder>/web/server.js` in terminal (as
 Step 2: Run the frontend — either locally by opening `index.html`, or go to[ https://scai-freshdesks.vercel.app/](http://smart-card-ai-3oob.vercel.app/)
 
 ### Available Endpoints
-- /api/auth	                                      Check if API key and domain are valid  
-- /api/data/<product>/<db>/<table>	              Get table data from Freshdesk  
-- /api/listsubtypes/<endpoint>	                  List index positions of objects in list response  
-- /api/fields/<endpoint>	                        List all field names available for that endpoint  
-
+- `/api/auth`	 :                                    Check if API key and domain are valid  
+- `/api/data/<product>/<db>/<table>`	:              Get table data from Freshdesk  
+- `/api/listsubtypes/<endpoint>`	     :             List index positions of objects in list response  
+- `/api/fields/<endpoint>`	            :            List all field names available for that endpoint
+<br>
 ⚠︎ /tokenrefresh is not required since Freshdesk uses simple API key authentication (Basic Auth)
