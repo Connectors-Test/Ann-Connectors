@@ -23,5 +23,5 @@ Step 2: Run the frontend — either locally by opening `index.html`, or go to[ h
 - /api/data/<product>/<db>/<table>	              Get table data from Freshdesk  
 - /api/listsubtypes/<endpoint>	                  List index positions of objects in list response  
 - /api/fields/<endpoint>	                        List all field names available for that endpoint  
-  
+
 ⚠︎ /tokenrefresh is not required since Freshdesk uses simple API key authentication (Basic Auth)
