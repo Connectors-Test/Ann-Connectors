@@ -23,3 +23,13 @@ For odoo online and gemini to query assistance:
 `GEMINI_API_KEY=blahblahblah`  
 `ODOO_URL=https://<your_domain>.odoo.com`  
 `ODOO_KEY="blahbluh"`
+
+### Available Endpoints
+- `/`                         : Health check  
+- `/auth`                    : Verify Odoo API connection  
+- `/get/<model>`             : Fetch data from Odoo model (use `?fields=` and `limit=`)  
+- `/schema/<model>`          : Get field schema of Odoo model  
+- `/listsubtypes/<model>`    : List unique values of a field (use `?field=`)  
+- `/gemini` (POST)           : Convert natural language to Odoo API call using Gemini
+  
+⚠︎ No `/tokenrefresh` needed : Odoo uses static UID & API key/password
