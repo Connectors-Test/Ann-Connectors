@@ -10,7 +10,8 @@ run `web/app.py` or just visit [here](https://scai-servicenow-web.vercel.app/) t
 ```env
 SERVICENOW_INSTANCE="https://<ur_domain>.service-now.com"  
 SERVICENOW_USER="admin"  
-SERVICENOW_PASS="blahblah"```
+SERVICENOW_PASS="blahblah"
+```
 
 ### Available Endpoints
 - `/`                           : Health check  

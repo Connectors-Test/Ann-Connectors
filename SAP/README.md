@@ -9,7 +9,8 @@ run `/LLMtoQuery/SAP/main.py` from Repo root
 ### .env structure: 
 ```env
 GEMINI_API_KEY=blahblah  
-SAP_SANDBOX_APIKEY=blacksheephaveyouanywool  ```
+SAP_SANDBOX_APIKEY=blacksheephaveyouanywool  
+```
 
 ### Available Endpoints
 - `/`                         : Health check  
