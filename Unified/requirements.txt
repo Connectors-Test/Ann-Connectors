@@ -1,0 +1,7 @@
+Flask
+requests
+psycopg2-binary
+mysql-connector-python
+pymongo
+snowflake-connector-python
+tabulate
