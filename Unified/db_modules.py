@@ -1,0 +1,222 @@
+import json
+import requests
+from flask import jsonify, request
+import databricks.sql
+import psycopg2
+import psycopg2.extras
+
+def fetch_from_databricks(creds, query=None, table=None, database=None):
+    conn = None
+    cursor = None
+    try:
+        # Connect
+        conn = databricks.sql.connect(
+            server_hostname=creds["server_hostname"],
+            http_path=creds["warehouse_id"],
+            access_token=creds["token"]
+        )
+        cursor = conn.cursor()
+
+        # Decide query
+        if query:
+            # Normalize spaces
+            query_clean = " ".join(query.strip().split())
+            query_lower = query_clean.lower()
+            # If FROM is missing, inject it before LIMIT (if present) from query arguments
+            if "from" not in query_lower:
+                if not (database and table):
+                    raise ValueError("Query missing FROM clause and database/table not provided")
+                if "limit" in query_lower:
+                    limit_index = query_lower.index("limit")
+                    before_limit = query_clean[:limit_index].strip()
+                    after_limit = query_clean[limit_index:].strip()
+                    query_clean = f"{before_limit} FROM {database}.{table} {after_limit}"
+                else:
+                    query_clean = f"{query_clean} FROM {database}.{table}"
+            sql_query = query_clean
+        elif database and table:
+            sql_query = f"SELECT * FROM {database}.{table}"
+        else:
+            raise ValueError("Either query or both database and table must be provided")
+
+        cursor.execute(sql_query)
+
+        # Extract results
+        columns = [col[0] for col in cursor.description]
+        rows = cursor.fetchall()
+        results = [dict(zip(columns, row)) for row in rows]
+
+        return results
+
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"Databricks fetch failed: {str(e)}"
+        }
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+def fetch_from_postgresql(creds, query=None, table=None, database=None, limit=None):
+    conn = None
+    cur = None
+    try:
+        # Connect
+        conn = psycopg2.connect(
+            host=creds["host"],
+            port=creds["port"],
+            user=creds["user"],
+            password=creds["password"],
+            database=creds["database"]
+        )
+
+        # Use DictCursor so fetch results are dicts directly
+        cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+        # Decide query
+        if query:
+            sql_query = query.strip()
+            if limit and "limit" not in sql_query.lower():
+                sql_query = f"{sql_query} LIMIT {limit}"
+        elif database and table:
+            sql_query = f'SELECT * FROM "{database}"."{table}"'
+            if limit:
+                sql_query = f"{sql_query} LIMIT {limit}"
+        else:
+            raise ValueError("Either query or both database and table must be provided")
+
+        # Execute
+        cur.execute(sql_query)
+        rows = cur.fetchall()
+
+        # Convert to list of dicts
+        results = [dict(row) for row in rows]
+
+        return results
+
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"PostgreSQL fetch failed: {str(e)}"
+        }
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
+def fetch_from_airtable(creds, table_name, query_params_raw=None):
+    """
+    Fetch records from Airtable with optional filtering, sorting, and pagination.
+
+    Args:
+        creds (dict): Airtable credentials with keys 'base_id' and 'api_key'.
+        table_name (str): Airtable table name.
+        query_params_raw (str, optional): Raw query parameters (JSON or Airtable formula).
+
+    Returns:
+        tuple: (Flask Response, HTTP status code)
+    """
+    try:
+        # Build API endpoint & headers
+        url = f"https://api.airtable.com/v0/{creds['base_id']}/{table_name}"
+        headers = {"Authorization": f"Bearer {creds['api_key']}"}
+
+        # Parse incoming query params
+        query_params = {}
+        if query_params_raw:
+            try:
+                query_params = json.loads(query_params_raw)  # JSON-based query
+            except json.JSONDecodeError:
+                query_params = {"filterByFormula": query_params_raw}  # formula string
+
+        all_records = []
+        offset = None
+
+        while True:
+            # Flatten params for Airtable
+            params = []
+            for key, value in query_params.items():
+                if isinstance(value, list):
+                    for item in value:
+                        params.append((key, item))
+                else:
+                    params.append((key, value))
+
+            if offset:
+                params.append(("offset", offset))
+
+            # Make request
+            response = requests.get(url, headers=headers, params=params)
+            response.raise_for_status()
+            resp_json = response.json()
+
+            if 'error' in resp_json:
+                return jsonify({
+                    "status": "error",
+                    "message": resp_json["error"]["message"]
+                }), 400
+
+            # Add new batch of records
+            records = resp_json.get("records", [])
+            all_records.extend(records)
+
+            # Handle pagination
+            offset = resp_json.get("offset")
+            if not offset:
+                break
+
+        # Format clean output (fields + id)
+        formatted_data = []
+        for record in all_records:
+            fields = record.get("fields", {})
+            fields["id"] = record.get("id")
+            formatted_data.append(fields)
+
+        return formatted_data, 200
+
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": f"Airtable fetch failed: {str(e)}"
+        }), 500
+
+import json
+import requests
+from flask import jsonify
+
+def fetch_from_googlesheet(creds, query):
+    """
+    Fetch data from a Google Sheet published via the gviz API.
+    creds: dict containing at least {'sheet_url': 'https://.../gviz/tq?tq='}
+    query: SQL-like query string (e.g., "SELECT *")
+    """
+    try:
+        # Construct full URL
+        url = f"{creds['sheet_url']}{query}"
+
+        response = requests.get(url)
+        response.raise_for_status()
+
+        # Google Sheets "gviz" API wraps JSON inside JS function call
+        text = response.text
+        json_start = text.find("({") + 1
+        json_end = text.rfind("})") + 1
+        raw_json = text[json_start:json_end]
+
+        data = json.loads(raw_json)
+
+        # Optional: normalize the data into list of dicts
+        table = data.get("table", {})
+        cols = [c.get("label", f"col_{i}") for i, c in enumerate(table.get("cols", []))]
+        rows = [
+            {cols[i]: (cell.get("v") if cell else None) for i, cell in enumerate(r.get("c", []))}
+            for r in table.get("rows", [])
+        ]
+
+        return rows
+
+    except Exception as e:
+        return {"status": "error", "message": f"Google Sheet fetch failed: {str(e)}"}

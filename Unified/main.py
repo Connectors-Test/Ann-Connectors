@@ -7,6 +7,7 @@ import snowflake.connector
 from sqlite_loader import *
 import json
 from sqlite_loader import fetch_api_credentials, fetch_db_credentials
+from db_modules import *
 
 db_creds = fetch_db_credentials()
 
@@ -41,23 +42,17 @@ def query_data(productType):
     try:
         data = []
 
-        if productType.lower() == "databricks":
-            url = f"{creds['base_url']}/api/2.0/sql/statements"
-            headers = {"Authorization": f"Bearer {creds['token']}"}
-            payload = {"statement": query, "warehouse_id": "<WAREHOUSE_ID>"}
-            response = requests.post(url, headers=headers, json=payload)
-            data = response.json()
+        if productType.lower() == "databricks":    
+            query = request.args.get("query", "SELECT 1")
+            tableName = request.args.get("table")
+            databaseName = request.args.get("database", "default")
+            return fetch_from_databricks(creds, query, tableName, databaseName)
 
-        elif productType.lower() == "postgresql":
-            conn = psycopg2.connect(
-                host=creds["host"], port=creds["port"],
-                user=creds["user"], password=creds["password"], database=creds["database"]
-            )
-            cur = conn.cursor()
-            cur.execute(query)
-            data = cur.fetchall()
-            cur.close()
-            conn.close()
+        elif productType.lower() == "postgresql":  
+            query = request.args.get("query", "SELECT 1")
+            tableName = request.args.get("table")
+            databaseName = request.args.get("database", "default")
+            return fetch_from_postgresql(creds, query, tableName, databaseName)
 
         elif productType.lower() == "mysql":
             conn = mysql.connector.connect(
@@ -88,27 +83,18 @@ def query_data(productType):
             conn.close()
 
         elif productType.lower() == "airtable":
-            url = f"https://api.airtable.com/v0/{creds['base_id']}/Table1"
-            headers = {"Authorization": f"Bearer {creds['api_key']}"}
-            params = {"filterByFormula": query}
-            response = requests.get(url, headers=headers, params=params)
-            data = response.json()
+            table = request.args.get("table")
+            query_raw = request.args.get("query")
+            return fetch_from_airtable(creds, table, query_raw)
 
         elif productType.lower() == "googlesheet":
-            url = f"{creds['sheet_url']}{query}"
-            response = requests.get(url)
-            if response.status_code == 200:
-                text = response.text
-                json_start = text.find("({") + 1
-                json_end = text.rfind("})") + 1
-                data = requests.utils.json.loads(text[json_start:json_end])
-            else:
-                return jsonify({"status": "error", "message": response.text}), response.status_code
-
+            query = request.args.get("query", "SELECT *")
+            return fetch_from_googlesheet(creds, query)
+        
         else:
             return jsonify({"status": "error", "message": "Unsupported productType"}), 400
 
-        return jsonify({"status": "success", "data": data})
+        return data
 
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500

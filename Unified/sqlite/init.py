@@ -7,7 +7,7 @@ load_dotenv()
 
 CREDENTIALS = {
     "databricks": {
-        "base_url": os.getenv("DATABRICKS_BASE_URL"),
+        "server_hostname": os.getenv("DATABRICKS_HOST_NAME"),
         "token": os.getenv("DATABRICKS_TOKEN"),
         "warehouse_id": os.getenv("DATABRICKS_WAREHOUSE_ID")
     },
@@ -51,7 +51,7 @@ CREDENTIALS = {
 PRODUCT_METADATA = {
     "databricks": {
         "description": "Databricks SQL API for executing SQL queries.",
-        "required_credentials": ["base_url", "token", "warehouse_id"],
+        "required_credentials": ["server_hostname", "token", "warehouse_id"],
         "required_parameters": ["credentials", "query"],
         "query_type": "SQL",
         "example_query": "SELECT * FROM sales LIMIT 10",
