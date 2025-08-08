@@ -7,10 +7,6 @@ import snowflake.connector
 from sqlite_loader import fetch_db_credentials
 from db_modules import *
 
-db_creds = fetch_db_credentials()
-
-print(db_creds)
-
 app = Flask(__name__)
 
 @app.route("/", methods=["GET"])
@@ -26,11 +22,20 @@ def root():
 @app.route("/query/<productType>", methods=["GET"])
 def query_data(productType):
     query = request.args.get("query")
+    uuid = request.args.get("uuid")
+
     if not query:
         return jsonify({"status": "error", "message": "query parameter is required"}), 400
 
-    # 🔍 Find credentials for the given productType
-    creds_entry = next((item for item in db_creds if item['dbname'].lower() == productType.lower()), None)
+    # Fetch credentials dynamically based on uuid or fallback
+    if uuid:
+        creds_entry = fetch_db_credentials(uuid=uuid)
+        # fetch_db_credentials should return either a single dict or list, handle accordingly
+        if isinstance(creds_entry, list):
+            creds_entry = next((item for item in creds_entry if item['dbname'].lower() == productType.lower()), None)
+    else:
+        creds_list = fetch_db_credentials()
+        creds_entry = next((item for item in creds_list if item['dbname'].lower() == productType.lower()), None)
 
     if not creds_entry:
         return jsonify({"status": "error", "message": "Invalid productType"}), 400
