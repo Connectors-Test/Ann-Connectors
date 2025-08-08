@@ -22,18 +22,22 @@ def fetch_from_databricks(creds, query=None, table=None, database=None):
             # Normalize spaces
             query_clean = " ".join(query.strip().split())
             query_lower = query_clean.lower()
+
             # If FROM is missing, inject it before LIMIT (if present) from query arguments
             if "from" not in query_lower:
                 if not (database and table):
                     raise ValueError("Query missing FROM clause and database/table not provided")
+                
                 if "limit" in query_lower:
                     limit_index = query_lower.index("limit")
                     before_limit = query_clean[:limit_index].strip()
                     after_limit = query_clean[limit_index:].strip()
                     query_clean = f"{before_limit} FROM {database}.{table} {after_limit}"
+                    
                 else:
                     query_clean = f"{query_clean} FROM {database}.{table}"
             sql_query = query_clean
+
         elif database and table:
             sql_query = f"SELECT * FROM {database}.{table}"
         else:
@@ -59,7 +63,7 @@ def fetch_from_databricks(creds, query=None, table=None, database=None):
         if conn:
             conn.close()
 
-def fetch_from_postgresql(creds, query=None, table=None, database=None, limit=None):
+def fetch_from_postgresql(creds, query=None, table=None, schema=None, limit=None):
     conn = None
     cur = None
     try:
@@ -78,10 +82,25 @@ def fetch_from_postgresql(creds, query=None, table=None, database=None, limit=No
         # Decide query
         if query:
             sql_query = query.strip()
-            if limit and "limit" not in sql_query.lower():
-                sql_query = f"{sql_query} LIMIT {limit}"
-        elif database and table:
-            sql_query = f'SELECT * FROM "{database}"."{table}"'
+
+            # If query has no FROM and table is provided, add FROM before LIMIT
+            if " from " not in sql_query.lower() and table:
+                table_ref = f'"{schema}"."{table}"' if schema else f'"{table}"'
+
+                # Case 1: Query already has LIMIT — we must insert FROM before it
+                limit_index = sql_query.lower().find(" limit ")
+                if limit_index != -1:
+                    select_part = sql_query[:limit_index].strip()  # before LIMIT
+                    limit_part = sql_query[limit_index:].strip()   # the LIMIT itself
+                    sql_query = f"{select_part} FROM {table_ref} {limit_part}"
+                else:
+                    sql_query = f"{sql_query} FROM {table_ref}"
+                    if limit:
+                        sql_query = f"{sql_query} LIMIT {limit}"
+
+        elif table:
+            table_ref = f'"{schema}"."{table}"' if schema else f'"{table}"'
+            sql_query = f'SELECT * FROM {table_ref}'
             if limit:
                 sql_query = f"{sql_query} LIMIT {limit}"
         else:

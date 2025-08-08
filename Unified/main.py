@@ -4,9 +4,7 @@ import psycopg2
 import mysql.connector
 from pymongo import MongoClient
 import snowflake.connector
-from sqlite_loader import *
-import json
-from sqlite_loader import fetch_api_credentials, fetch_db_credentials
+from sqlite_loader import fetch_db_credentials
 from db_modules import *
 
 db_creds = fetch_db_credentials()
@@ -50,9 +48,8 @@ def query_data(productType):
 
         elif productType.lower() == "postgresql":  
             query = request.args.get("query", "SELECT 1")
-            tableName = request.args.get("table")
-            databaseName = request.args.get("database", "default")
-            return fetch_from_postgresql(creds, query, tableName, databaseName)
+            table = request.args.get("table")
+            return fetch_from_postgresql(creds, query, table)
 
         elif productType.lower() == "mysql":
             conn = mysql.connector.connect(

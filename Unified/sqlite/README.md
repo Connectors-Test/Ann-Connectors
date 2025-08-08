@@ -1,32 +1,28 @@
-# Quick Guide for Using SQLite Credential Manager
+## Guide for using SQLite Credential Manager(this folder)
 
-## 🛠 Setup
+### Setup
 
 1. Make sure `init.py` has been run at least once to:
-   - ✅ Create the SQLite DB (`wwwsmart_credentials.db`)
-   - ✅ Create required tables: `Api_connector_credentials`, `Db_connector_credentials`
-   - ✅ Insert dummy credentials for testing
+   - Create the SQLite DB (`wwwsmart_credentials.db`)
+   - Create required tables: `Api_connector_credentials`, `Db_connector_credentials`
+   - Insert dummy credentials for testing
 
-2. Modules live in:
+2. What other files do:
    - `modules.py` → This script contains modules for SQLite actions
-   - `view_table.py` → This script shows the tables
+   - `view_table.py` → This script can be used to view the tables
    - `manager.py` → This script helps manage DB credentials stored via `init.py`
 
----
-
-## ⚙️ Available Functions (`modules.py`)
+### Available Functions (`modules.py`)
 
 | Function           | Description                                      |
 |--------------------|--------------------------------------------------|
 | `create_table(...)` | Create a new table if needed                    |
 | `upsert_credential(...)` | Insert or update credentials              |
-| `get_credentials(...)` | Fetch credentials for given user+uuid |
+| `get_credentials(...)` | Fetch credentials for given user, uuid or product_name |
 | `delete_credential(...)` | Delete a specific credential entry        |
 | `delete_table(...)` | Drop an entire table (Caution!)                |
 
----
-
-## 🧪 Usage Examples for `manager.py`
+### Usage Examples for `manager.py`
 
 ```python
 from modules import *
