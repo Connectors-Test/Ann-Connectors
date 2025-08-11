@@ -7,6 +7,7 @@ import psycopg2.extras
 from pymongo import MongoClient
 from bson import json_util, ObjectId
 import mysql.connector
+import urllib.parse
 
 def fetch_from_databricks(creds, query=None, table=None, database=None):
     conn = None
@@ -385,12 +386,14 @@ def fetch_from_airtable(creds, table_name, query_params_raw=None):
 def fetch_from_googlesheet(creds, query):
     """
     Fetch data from a Google Sheet published via the gviz API.
-    creds: dict containing at least {'sheet_url': 'https://.../gviz/tq?tq='}
+    creds: dict containing at least {'sheet_id': 'https://.../gviz/tq?tq='}
     query: SQL-like query string (e.g., "SELECT *")
     """
     try:
         # Construct full URL
-        url = f"{creds['sheet_url']}{query}"
+        base_url = f"https://docs.google.com/spreadsheets/d/{creds['sheet_id']}/gviz/tq?tq="
+        encoded_query = urllib.parse.quote(query) # URL-encode the query string
+        url = base_url + encoded_query
 
         response = requests.get(url)
         response.raise_for_status()

@@ -43,7 +43,7 @@ CREDENTIALS = {
         "api_key": os.getenv("AIRTABLE_API_KEY")
     },
     "googlesheet": {
-        "sheet_url": os.getenv("GOOGLE_SHEET_URL")
+        "sheet_id": os.getenv("GOOGLE_SHEET_ID")
     }
 }
 
@@ -96,7 +96,7 @@ PRODUCT_METADATA = {
     },
     "googlesheet": {
         "description": "Google Sheets using gviz/tq query.",
-        "required_credentials": ["sheet_url"],
+        "required_credentials": ["sheet_id"],
         "required_parameters": ["credentials", "query"],
         "query_type": "Google Visualization Query Language",
         "example_query": "select A, B, C where A > 10"
