@@ -72,15 +72,12 @@ def query_data(productType):
             return fetch_from_mongodb(creds, query, collection, database, limit)
 
         elif productType.lower() == "snowflake":
-            conn = snowflake.connector.connect(
-                user=creds["user"], password=creds["password"], account=creds["account"],
-                warehouse=creds["warehouse"], database=creds["database"], schema=creds["schema"]
-            )
-            cur = conn.cursor()
-            cur.execute(query)
-            data = cur.fetchall()
-            cur.close()
-            conn.close()
+            query = request.args.get("query")
+            table = request.args.get("table")
+            database = request.args.get("database")
+            schema = request.args.get("schema")
+            limit = request.args.get("limit")
+            return fetch_from_snowflake(creds, query, table, database, schema, limit)
 
         elif productType.lower() == "airtable":
             table = request.args.get("table")

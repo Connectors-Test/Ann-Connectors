@@ -182,6 +182,68 @@ def fetch_from_mongodb(creds, query=None, collection=None, database=None, limit=
         if client:
             client.close()
 
+import snowflake.connector
+
+def fetch_from_snowflake(creds, query=None, table=None, database=None, schema=None, limit=None):
+    conn = None
+    cur = None
+    try:
+        # Connect
+        conn = snowflake.connector.connect(
+            user=creds["user"],
+            password=creds["password"],
+            account=creds["account"],
+            warehouse=creds["warehouse"],
+            database=database or creds.get("database"),
+            schema=schema or creds.get("schema")
+        )
+        cur = conn.cursor()
+
+        # Decide query
+        if query:
+            sql_query = query.strip()
+
+            # If FROM is missing and table is provided, inject it before LIMIT if present
+            if " from " not in sql_query.lower() and table:
+                table_ref = f'"{schema}"."{table}"' if schema else f'"{table}"'
+                limit_index = sql_query.lower().find(" limit ")
+                if limit_index != -1:
+                    select_part = sql_query[:limit_index].strip()
+                    limit_part = sql_query[limit_index:].strip()
+                    sql_query = f"{select_part} FROM {table_ref} {limit_part}"
+                else:
+                    sql_query = f"{sql_query} FROM {table_ref}"
+                    if limit:
+                        sql_query = f"{sql_query} LIMIT {limit}"
+        elif table:
+            table_ref = f'"{schema}"."{table}"' if schema else f'"{table}"'
+            sql_query = f"SELECT * FROM {table_ref}"
+            if limit:
+                sql_query = f"{sql_query} LIMIT {limit}"
+        else:
+            raise ValueError("Either query or both database and table must be provided")
+
+        # Execute
+        cur.execute(sql_query)
+
+        # Extract results
+        columns = [desc[0] for desc in cur.description]
+        rows = cur.fetchall()
+        results = [dict(zip(columns, row)) for row in rows]
+
+        return results
+
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"Snowflake fetch failed: {str(e)}"
+        }
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
 def fetch_from_airtable(creds, table_name, query_params_raw=None):
     """
     Fetch records from Airtable with optional filtering, sorting, and pagination.
