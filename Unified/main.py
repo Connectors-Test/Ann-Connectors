@@ -19,14 +19,14 @@ def root():
 @app.route("/query/<productType>", methods=["GET"])
 def query_data(productType):
     query = request.args.get("query")
-    uuid = request.args.get("uuid")
+    userid = request.args.get("userid")
 
     if not query:
         return jsonify({"status": "error", "message": "query parameter is required"}), 400
 
-    # Fetch credentials dynamically based on uuid or fallback
-    if uuid:
-        creds_entry = fetch_db_credentials(uuid=uuid)
+    # Fetch credentials dynamically based on userid or fallback
+    if userid:
+        creds_entry = fetch_db_credentials(user_id=userid)
         # fetch_db_credentials should return either a single dict or list, handle accordingly
         if isinstance(creds_entry, list):
             creds_entry = next((item for item in creds_entry if item['dbname'].lower() == productType.lower()), None)
