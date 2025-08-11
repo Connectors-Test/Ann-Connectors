@@ -67,7 +67,7 @@ def fetch_from_databricks(creds, query=None, table=None, database=None):
         if conn:
             conn.close()
 
-def fetch_from_postgresql(creds, query=None, table=None, schema=None, limit=None):
+def fetch_from_postgresql(creds, query=None, table=None, schema=None):
     conn = None
     cur = None
     try:
@@ -99,14 +99,10 @@ def fetch_from_postgresql(creds, query=None, table=None, schema=None, limit=None
                     sql_query = f"{select_part} FROM {table_ref} {limit_part}"
                 else:
                     sql_query = f"{sql_query} FROM {table_ref}"
-                    if limit:
-                        sql_query = f"{sql_query} LIMIT {limit}"
 
         elif table:
             table_ref = f'"{schema}"."{table}"' if schema else f'"{table}"'
             sql_query = f'SELECT * FROM {table_ref}'
-            if limit:
-                sql_query = f"{sql_query} LIMIT {limit}"
         else:
             raise ValueError("Either query or both database and table must be provided")
 
@@ -132,7 +128,7 @@ def fetch_from_postgresql(creds, query=None, table=None, schema=None, limit=None
 
 import mysql.connector
 
-def fetch_from_mysql(creds, query=None, table=None, schema=None, limit=None):
+def fetch_from_mysql(creds, query=None, table=None, schema=None):
     conn = None
     cur = None
     try:
@@ -163,14 +159,9 @@ def fetch_from_mysql(creds, query=None, table=None, schema=None, limit=None):
                     sql_query = f"{select_part} FROM {table_ref} {limit_part}"
                 else:
                     sql_query = f"{sql_query} FROM {table_ref}"
-                    if limit:
-                        sql_query = f"{sql_query} LIMIT {limit}"
-
         elif table:
             table_ref = f"`{schema}`.`{table}`" if schema else f"`{table}`"
             sql_query = f"SELECT * FROM {table_ref}"
-            if limit:
-                sql_query = f"{sql_query} LIMIT {limit}"
         else:
             raise ValueError("Either query or table must be provided")
 
@@ -247,7 +238,7 @@ def fetch_from_mongodb(creds, query=None, collection=None, database=None, limit=
 
 import snowflake.connector
 
-def fetch_from_snowflake(creds, query=None, table=None, database=None, schema=None, limit=None):
+def fetch_from_snowflake(creds, query=None, table=None, database=None, schema=None):
     conn = None
     cur = None
     try:
@@ -276,13 +267,9 @@ def fetch_from_snowflake(creds, query=None, table=None, database=None, schema=No
                     sql_query = f"{select_part} FROM {table_ref} {limit_part}"
                 else:
                     sql_query = f"{sql_query} FROM {table_ref}"
-                    if limit:
-                        sql_query = f"{sql_query} LIMIT {limit}"
         elif table:
             table_ref = f'"{schema}"."{table}"' if schema else f'"{table}"'
             sql_query = f"SELECT * FROM {table_ref}"
-            if limit:
-                sql_query = f"{sql_query} LIMIT {limit}"
         else:
             raise ValueError("Either query or both database and table must be provided")
 

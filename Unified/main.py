@@ -62,16 +62,14 @@ def query_data(productType):
             query = request.args.get("query")
             collection = request.args.get("collection")
             database = request.args.get("database")
-            limit = request.args.get("limit")
-            return fetch_from_mongodb(creds, query, collection, database, limit)
+            return fetch_from_mongodb(creds, query, collection, database)
 
         elif productType.lower() == "snowflake":
             query = request.args.get("query")
             table = request.args.get("table")
             database = request.args.get("database")
             schema = request.args.get("schema")
-            limit = request.args.get("limit")
-            return fetch_from_snowflake(creds, query, table, database, schema, limit)
+            return fetch_from_snowflake(creds, query, table, database, schema)
 
         elif productType.lower() == "airtable":
             table = request.args.get("table")
