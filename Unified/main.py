@@ -1,8 +1,5 @@
 from flask import Flask, request, jsonify
-import requests
-import psycopg2
 import mysql.connector
-from pymongo import MongoClient
 import snowflake.connector
 from sqlite_loader import fetch_db_credentials
 from db_modules import *
@@ -68,10 +65,11 @@ def query_data(productType):
             conn.close()
 
         elif productType.lower() == "mongodb":
-            client = MongoClient(creds["uri"])
-            db = client[creds["database"]]
-            data = list(db.command("eval", query)["retval"])
-            client.close()
+            query = request.args.get("query")
+            collection = request.args.get("collection")
+            database = request.args.get("database")
+            limit = request.args.get("limit")
+            return fetch_from_mongodb(creds, query, collection, database, limit)
 
         elif productType.lower() == "snowflake":
             conn = snowflake.connector.connect(

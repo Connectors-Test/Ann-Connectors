@@ -5,3 +5,4 @@ mysql-connector-python
 pymongo
 snowflake-connector-python
 tabulate
+databricks-sql-connector

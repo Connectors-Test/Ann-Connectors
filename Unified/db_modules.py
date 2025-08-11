@@ -4,6 +4,8 @@ from flask import jsonify, request
 import databricks.sql
 import psycopg2
 import psycopg2.extras
+from pymongo import MongoClient
+from bson import json_util, ObjectId
 
 def fetch_from_databricks(creds, query=None, table=None, database=None):
     conn = None
@@ -126,6 +128,60 @@ def fetch_from_postgresql(creds, query=None, table=None, schema=None, limit=None
         if conn:
             conn.close()
 
+def serialize_document(doc): ## For formatting MongoDB results
+    if isinstance(doc, list):
+        return [serialize_document(d) for d in doc]
+    if isinstance(doc, dict):
+        return {k: serialize_document(v) for k, v in doc.items()}
+    if isinstance(doc, ObjectId):
+        return str(doc)
+    return doc
+
+def fetch_from_mongodb(creds, query=None, collection=None, database=None, limit=None):
+    client = None
+    try:
+        # Connect
+        client = MongoClient(creds["uri"])
+        db = client[database or creds.get("database")]
+        collection = collection or creds.get("collection")
+        if not collection:
+            raise ValueError("Collection name must be provided for MongoDB queries")
+
+        coll = db[collection]
+
+        # Decide query
+        if query:
+            try:
+                # Try parsing query if passed as JSON string
+                if isinstance(query, str):
+                    query_dict = json_util.loads(query)
+                elif isinstance(query, dict):
+                    query_dict = query
+                else:
+                    raise ValueError("Query must be a JSON string or dict")
+            except Exception as e:
+                raise ValueError(f"Invalid MongoDB query: {e}")
+        else:
+            query_dict = {}
+
+        cursor = coll.find(query_dict)
+
+        if limit:
+            cursor = cursor.limit(int(limit))
+
+        # Convert cursor to list and serialize BSON to JSON-friendly types
+        results = list(cursor)
+        return serialize_document(results)
+
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"MongoDB fetch failed: {str(e)}"
+        }
+    finally:
+        if client:
+            client.close()
+
 def fetch_from_airtable(creds, table_name, query_params_raw=None):
     """
     Fetch records from Airtable with optional filtering, sorting, and pagination.
@@ -201,10 +257,6 @@ def fetch_from_airtable(creds, table_name, query_params_raw=None):
             "status": "error",
             "message": f"Airtable fetch failed: {str(e)}"
         }), 500
-
-import json
-import requests
-from flask import jsonify
 
 def fetch_from_googlesheet(creds, query):
     """

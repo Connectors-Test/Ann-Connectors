@@ -112,8 +112,8 @@ create_table(DB_NAME, "Db_connector_credentials")
 
 import uuid
 
-dummy_userid = "user_001"
-dummy_uuid = str(uuid.uuid4())
+dummy_userid = str(uuid.uuid4())
+dummy_uuid = "user_001"
 dummy_username = "testuser"
 
 for product, creds in CREDENTIALS.items():
