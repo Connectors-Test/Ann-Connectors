@@ -6,6 +6,7 @@ import psycopg2
 import psycopg2.extras
 from pymongo import MongoClient
 from bson import json_util, ObjectId
+import mysql.connector
 
 def fetch_from_databricks(creds, query=None, table=None, database=None):
     conn = None
@@ -121,6 +122,67 @@ def fetch_from_postgresql(creds, query=None, table=None, schema=None, limit=None
         return {
             "status": "error",
             "message": f"PostgreSQL fetch failed: {str(e)}"
+        }
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
+import mysql.connector
+
+def fetch_from_mysql(creds, query=None, table=None, schema=None, limit=None):
+    conn = None
+    cur = None
+    try:
+        # Connect
+        conn = mysql.connector.connect(
+            host=creds["host"],
+            port=creds["port"],
+            user=creds["user"],
+            password=creds["password"],
+            database=creds["database"]
+        )
+        cur = conn.cursor(dictionary=True)  # dictionary=True => dict rows
+
+        if table:
+            table = table.strip()
+
+        # Decide query
+        if query:
+            sql_query = query.strip()
+
+            if " from " not in sql_query.lower() and table:
+                table_ref = f"`{schema}`.`{table}`" if schema else f"`{table}`"
+
+                limit_index = sql_query.lower().find(" limit ")
+                if limit_index != -1:
+                    select_part = sql_query[:limit_index].strip()
+                    limit_part = sql_query[limit_index:].strip()
+                    sql_query = f"{select_part} FROM {table_ref} {limit_part}"
+                else:
+                    sql_query = f"{sql_query} FROM {table_ref}"
+                    if limit:
+                        sql_query = f"{sql_query} LIMIT {limit}"
+
+        elif table:
+            table_ref = f"`{schema}`.`{table}`" if schema else f"`{table}`"
+            sql_query = f"SELECT * FROM {table_ref}"
+            if limit:
+                sql_query = f"{sql_query} LIMIT {limit}"
+        else:
+            raise ValueError("Either query or table must be provided")
+
+        # Execute
+        cur.execute(sql_query)
+        rows = cur.fetchall()
+
+        return rows  # already dicts
+
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"MySQL fetch failed: {str(e)}"
         }
     finally:
         if cur:

@@ -54,16 +54,10 @@ def query_data(productType):
             return fetch_from_postgresql(creds, query, table)
 
         elif productType.lower() == "mysql":
-            conn = mysql.connector.connect(
-                host=creds["host"], port=creds["port"],
-                user=creds["user"], password=creds["password"], database=creds["database"]
-            )
-            cur = conn.cursor()
-            cur.execute(query)
-            data = cur.fetchall()
-            cur.close()
-            conn.close()
-
+            query = request.args.get("query", "SELECT 1")
+            table = request.args.get("table")
+            return fetch_from_mysql(creds, query, table)
+        
         elif productType.lower() == "mongodb":
             query = request.args.get("query")
             collection = request.args.get("collection")
