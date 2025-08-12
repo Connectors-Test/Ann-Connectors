@@ -7,6 +7,8 @@ import psycopg2.extras
 from pymongo import MongoClient
 from bson import json_util, ObjectId
 import mysql.connector
+from neo4j import GraphDatabase
+from neo4j.time import DateTime
 
 def fetch_from_databricks(creds, query=None, table=None, database=None):
     conn = None
@@ -215,7 +217,7 @@ def fetch_from_mysql(creds, query=None, table=None, schema=None):
         if conn:
             conn.close()
 
-def serialize_document(doc): ## For formatting MongoDB results
+def serialize_document(doc):                                      # For formatting MongoDB results to JSON-friendly types
     if isinstance(doc, list):
         return [serialize_document(d) for d in doc]
     if isinstance(doc, dict):
@@ -407,3 +409,60 @@ def fetch_from_airtable(creds, table_name, query_params_raw=None):
             "status": "error",
             "message": f"Airtable fetch failed: {str(e)}"
         }), 500
+
+def serialize_value(value):                                               # Convert Neo4j values to JSON-friendly types
+    # Convert Neo4j special types to JSON-friendly ones
+    if isinstance(value, DateTime):
+        return value.iso_format()  # or str(value) if you want a simple string
+    if hasattr(value, "items"):  # Node or Relationship
+        return {k: serialize_value(v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [serialize_value(v) for v in value]
+    return value
+
+def fetch_from_neo4j(creds, query=None, label=None):
+    """
+    Fetch data from a Neo4j database.
+
+    Args:
+        creds (dict): Must have 'uri', 'username', 'password', 'database'.
+        query (str, optional): Cypher query string. If not provided, will auto-build from label/limit.
+        label (str, optional): Node label to query (e.g., 'DevOps').
+        limit (int, optional): Row limit.
+
+    Returns:
+        list[dict]: Query results as list of dicts.
+    """
+    driver = None
+    try:
+        # Connect to Neo4j
+        driver = GraphDatabase.driver(
+            creds["uri"],
+            auth=(creds["username"], creds["password"])
+        )
+
+        # Build query if not given
+        if not query:
+            if not label:
+                raise ValueError("Either 'query' or 'label' must be provided")
+            query = f"MATCH (n:{label}) RETURN n"
+
+        # Run query
+        with driver.session(database=creds.get("database", "neo4j")) as session:
+            results = session.run(query)
+            data = []
+            for record in results:
+                clean_record = {}
+                for key, value in record.items():
+                    clean_record[key] = serialize_value(value)
+                data.append(clean_record)
+            return data
+
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"Neo4j fetch failed: {str(e)}"
+        }
+    finally:
+        if driver:
+            driver.close()

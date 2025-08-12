@@ -47,6 +47,12 @@ CREDENTIALS = {
     "airtable": {
         "base_id": os.getenv("AIRTABLE_BASE_ID"),
         "api_key": os.getenv("AIRTABLE_API_KEY")
+    },
+    "neo4j": {
+        "uri": os.getenv("NEO4J_URI"),
+        "username": os.getenv("NEO4J_USERNAME"),
+        "password": os.getenv("NEO4J_PASSWORD"),
+        "database": os.getenv("NEO4J_DATABASE")
     }
 }
 
@@ -105,6 +111,13 @@ PRODUCT_METADATA = {
         "required_parameters": ["credentials", "table_name", "filterByFormula"],
         "query_type": "Formula Expression",
         "example_query": "FIND('Laptop', {ProductName})"
+    },
+    "neo4j": {
+        "description": "Neo4j graph database connection using the official Python driver.",
+        "required_credentials": ["uri", "username", "password", "database"],
+        "required_parameters": ["credentials", "query"],
+        "query_type": "Cypher",
+        "example_query": "MATCH (n:DevOps) RETURN n LIMIT 10"
     }
 }
 

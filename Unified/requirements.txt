@@ -6,3 +6,4 @@ pymongo
 snowflake-connector-python
 tabulate
 databricks-sql-connector
+neo4j

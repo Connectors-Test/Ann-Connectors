@@ -72,6 +72,10 @@ def db_query_data(productType):
             table = request.args.get("table")
             return fetch_from_airtable(creds, table, query)
         
+        elif productType.lower() == "neo4j":
+            label = request.args.get("label", None)
+            return fetch_from_neo4j(creds, query, label)
+        
         else:
             return jsonify({"status": "error", "message": "Unsupported productType"}), 400
 
