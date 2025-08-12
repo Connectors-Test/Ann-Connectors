@@ -1,7 +1,7 @@
 import sqlite3
 import json
 
-def view_db_table_json(db_name, table):
+def view_table_json(db_name, table):
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
     print(f"\n Table: {table}")
@@ -16,7 +16,7 @@ def view_db_table_json(db_name, table):
         record = dict(zip(columns, row))
         print("\n📄 Record:")
         for key, value in record.items():
-            if key in ["dbcredentials", "metadata"]:
+            if key in ["credentials", "metadata"]:
                 try:
                     parsed = json.loads(value)
                     print(f"🔸 {key}:\n{json.dumps(parsed, indent=2)}")
@@ -26,4 +26,5 @@ def view_db_table_json(db_name, table):
                 print(f"🔹 {key}: {value}")
     conn.close()
 
-view_db_table_json("wwwsmart_credentials.db", "Db_connector_credentials")
+view_table_json("wwwsmart_credentials.db", "Db_connector_credentials")
+view_table_json("wwwsmart_credentials.db", "SS_connector_credentials")

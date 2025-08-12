@@ -1,8 +1,7 @@
 from flask import Flask, request, jsonify
-import mysql.connector
-import snowflake.connector
-from sqlite_loader import fetch_db_credentials
-from db_modules import *
+from sqlite_loader import *
+from modules.databases import *
+from modules.spreadsheet import *
 
 app = Flask(__name__)
 
@@ -16,8 +15,8 @@ def root():
         ]
     })
 
-@app.route("/query/<productType>", methods=["GET"])
-def query_data(productType):
+@app.route("/query/db/<productType>", methods=["GET"])
+def db_query_data(productType):
     query = request.args.get("query")
     userid = request.args.get("userid")
 
@@ -29,10 +28,10 @@ def query_data(productType):
         creds_entry = fetch_db_credentials(user_id=userid)
         # fetch_db_credentials should return either a single dict or list, handle accordingly
         if isinstance(creds_entry, list):
-            creds_entry = next((item for item in creds_entry if item['dbname'].lower() == productType.lower()), None)
+            creds_entry = next((item for item in creds_entry if item['name'].lower() == productType.lower()), None)
     else:
         creds_list = fetch_db_credentials()
-        creds_entry = next((item for item in creds_list if item['dbname'].lower() == productType.lower()), None)
+        creds_entry = next((item for item in creds_list if item['name'].lower() == productType.lower()), None)
 
     if not creds_entry:
         return jsonify({"status": "error", "message": "Invalid productType"}), 400
@@ -40,8 +39,6 @@ def query_data(productType):
     creds = creds_entry['credentials']
 
     try:
-        data = []
-
         if productType.lower() == "databricks":    
             query = request.args.get("query", "SELECT 1")
             tableName = request.args.get("table")
@@ -75,15 +72,42 @@ def query_data(productType):
             table = request.args.get("table")
             query_raw = request.args.get("query")
             return fetch_from_airtable(creds, table, query_raw)
-
-        elif productType.lower() == "googlesheet":
-            query = request.args.get("query", "SELECT *")
-            return fetch_from_googlesheet(creds, query)
         
         else:
             return jsonify({"status": "error", "message": "Unsupported productType"}), 400
 
-        return data
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route("/query/ss/<productType>", methods=["GET"])
+def ss_query_data(productType):
+    query = request.args.get("query")
+    userid = request.args.get("userid")
+
+    if not query:
+        return jsonify({"status": "error", "message": "query parameter is required"}), 400
+
+    # Fetch credentials dynamically based on userid or fallback
+    if userid:
+        creds_entry = fetch_ss_credentials(user_id=userid)
+        if isinstance(creds_entry, list):
+            creds_entry = next((item for item in creds_entry if item['name'].lower() == productType.lower()), None)
+    else:
+        creds_list = fetch_ss_credentials()
+        creds_entry = next((item for item in creds_list if item['name'].lower() == productType.lower()), None)
+
+    if not creds_entry:
+        return jsonify({"status": "error", "message": "Invalid productType"}), 400
+
+    creds = creds_entry['credentials']
+
+    try:
+        if productType.lower() == "googlesheet":
+            query = request.args.get("query", "SELECT *")
+            return fetch_from_googlesheet(creds, query)
+
+        else:
+            return jsonify({"status": "error", "message": "Unsupported productType"}), 400
 
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
@@ -95,13 +119,13 @@ def get_metadata():
 
     if product_type:
         for db in db_creds:
-            if db["dbname"].lower() == product_type.lower():
+            if db["name"].lower() == product_type.lower():
                 return jsonify({"status": "success", "data": db["metadata"]})
         return jsonify({"status": "error", "message": "Invalid productType"}), 400
 
     # Return metadata for all product types
     all_metadata = {
-        db["dbname"]: db["metadata"] for db in db_creds
+        db["name"]: db["metadata"] for db in db_creds
     }
     return jsonify({"status": "success", "data": all_metadata})
 

@@ -9,8 +9,8 @@ def create_table(db_name, table):
             userid TEXT NOT NULL,
             uuid TEXT NOT NULL,
             username TEXT NOT NULL,
-            dbname TEXT NOT NULL,
-            dbcredentials TEXT NOT NULL,
+            name TEXT NOT NULL,
+            credentials TEXT NOT NULL,
             metadata TEXT
         );
     """)
@@ -24,14 +24,14 @@ def delete_table(db_name, table):
     conn.commit()
     conn.close()
 
-def upsert_credential(db_name, table, userid, uuid, username, dbname, dbcredentials, metadata=None):
+def upsert_credential(db_name, table, userid, uuid, username, name, credentials, metadata=None):
     if metadata:
         if isinstance(metadata, str):
             metadata = json.loads(metadata)
         required = metadata.get("required_credentials", [])
-        missing = [key for key in required if key not in dbcredentials]
+        missing = [key for key in required if key not in credentials]
         if missing:
-            raise ValueError(f"Missing required fields for {dbname}: {missing}")
+            raise ValueError(f"Missing required fields for {name}: {missing}")
         metadata_json = json.dumps(metadata)
     else:
         metadata_json = None
@@ -42,23 +42,23 @@ def upsert_credential(db_name, table, userid, uuid, username, dbname, dbcredenti
     # Check if entry exists
     cursor.execute(f"""
         SELECT COUNT(*) FROM {table}
-        WHERE userid=? AND uuid=? AND dbname=?
-    """, (userid, uuid, dbname))
+        WHERE userid=? AND uuid=? AND name=?
+    """, (userid, uuid, name))
 
     exists = cursor.fetchone()[0] > 0
-    dbcredentials_json = json.dumps(dbcredentials)
+    credentials_json = json.dumps(credentials)
 
     if exists:
         cursor.execute(f"""
             UPDATE {table}
-            SET username=?, dbcredentials=?, metadata=?
-            WHERE userid=? AND uuid=? AND dbname=?
-        """, (username, dbcredentials_json, metadata_json, userid, uuid, dbname))
+            SET username=?, credentials=?, metadata=?
+            WHERE userid=? AND uuid=? AND name=?
+        """, (username, credentials_json, metadata_json, userid, uuid, name))
     else:
         cursor.execute(f"""
-            INSERT INTO {table} (userid, uuid, username, dbname, dbcredentials, metadata)
+            INSERT INTO {table} (userid, uuid, username, name, credentials, metadata)
             VALUES (?, ?, ?, ?, ?, ?)
-        """, (userid, uuid, username, dbname, dbcredentials_json, metadata_json))
+        """, (userid, uuid, username, name, credentials_json, metadata_json))
 
     conn.commit()
     conn.close()
@@ -67,7 +67,7 @@ def get_credentials(db_name, table, userid=None, uuid=None, product_name=None):
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
 
-    query = f"SELECT userid, uuid, username, dbname, dbcredentials, metadata FROM {table} WHERE 1=1"
+    query = f"SELECT userid, uuid, username, name, credentials, metadata FROM {table} WHERE 1=1"
     params = []
 
     if userid is not None:
@@ -79,7 +79,7 @@ def get_credentials(db_name, table, userid=None, uuid=None, product_name=None):
         params.append(uuid)
 
     if product_name is not None:
-        query += " AND dbname=?"
+        query += " AND name=?"
         params.append(product_name)
 
     cursor.execute(query, tuple(params))
@@ -87,7 +87,7 @@ def get_credentials(db_name, table, userid=None, uuid=None, product_name=None):
     conn.close()
 
     if not rows:
-        raise ValueError(f"No credentials found for given filters: userid={userid}, uuid={uuid}, dbname={product_name}")
+        raise ValueError(f"No credentials found for given filters: userid={userid}, uuid={uuid}, name={product_name}")
 
     results = []
     for row in rows:
@@ -105,19 +105,19 @@ def get_credentials(db_name, table, userid=None, uuid=None, product_name=None):
             "userid": row[0],
             "uuid": row[1],
             "username": row[2],
-            "dbname": row[3],
+            "name": row[3],
             "credentials": creds,
             "metadata": meta
         })
 
     return results
 
-def delete_credential(db_name, table, userid, uuid, dbname):
+def delete_credential(db_name, table, userid, uuid, name):
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
     cursor.execute(f"""
         DELETE FROM {table}
-        WHERE userid=? AND uuid=? AND dbname=?
-    """, (userid, uuid, dbname))
+        WHERE userid=? AND uuid=? AND name=?
+    """, (userid, uuid, name))
     conn.commit()
     conn.close()

@@ -36,14 +36,12 @@ CREDENTIALS = {
         "account": os.getenv("SNOWFLAKE_ACCOUNT"),
         "warehouse": os.getenv("SNOWFLAKE_WAREHOUSE"),
         "database": os.getenv("SNOWFLAKE_DATABASE"),
-        "schema": os.getenv("SNOWFLAKE_SCHEMA")
+        "schema": os.getenv("SNOWFLAKE_SCHEMA"),
+        "table": os.getenv("SNOWFLAKE_TABLE")
     },
     "airtable": {
         "base_id": os.getenv("AIRTABLE_BASE_ID"),
         "api_key": os.getenv("AIRTABLE_API_KEY")
-    },
-    "googlesheet": {
-        "sheet_id": os.getenv("GOOGLE_SHEET_ID")
     }
 }
 
@@ -82,7 +80,7 @@ PRODUCT_METADATA = {
     },
     "snowflake": {
         "description": "Snowflake data warehouse connection.",
-        "required_credentials": ["user", "password", "account", "warehouse", "database", "schema"],
+        "required_credentials": ["user", "password", "account", "warehouse", "database", "schema", "table"],
         "required_parameters": ["credentials", "query"],
         "query_type": "SQL",
         "example_query": "SELECT * FROM products LIMIT 10"
@@ -93,13 +91,6 @@ PRODUCT_METADATA = {
         "required_parameters": ["credentials", "table_name", "filterByFormula"],
         "query_type": "Formula Expression",
         "example_query": "FIND('Laptop', {ProductName})"
-    },
-    "googlesheet": {
-        "description": "Google Sheets using gviz/tq query.",
-        "required_credentials": ["sheet_id"],
-        "required_parameters": ["credentials", "query"],
-        "query_type": "Google Visualization Query Language",
-        "example_query": "select A, B, C where A > 10"
     }
 }
 
@@ -127,8 +118,8 @@ for product, creds in CREDENTIALS.items():
             userid=dummy_userid,
             uuid=dummy_uuid,
             username=dummy_username,
-            dbname=product,
-            dbcredentials=filtered_creds,
+            name=product,
+            credentials=filtered_creds,
             metadata=json.dumps(PRODUCT_METADATA[product])
         )
         print(f"✅ Inserted {product}")

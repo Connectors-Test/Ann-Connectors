@@ -1,13 +1,12 @@
 import json
 import requests
-from flask import jsonify, request
+from flask import jsonify
 import databricks.sql
 import psycopg2
 import psycopg2.extras
 from pymongo import MongoClient
 from bson import json_util, ObjectId
 import mysql.connector
-import urllib.parse
 
 def fetch_from_databricks(creds, query=None, table=None, database=None):
     conn = None
@@ -126,8 +125,6 @@ def fetch_from_postgresql(creds, query=None, table=None, schema=None):
         if conn:
             conn.close()
 
-import mysql.connector
-
 def fetch_from_mysql(creds, query=None, table=None, schema=None):
     conn = None
     cur = None
@@ -242,24 +239,29 @@ def fetch_from_snowflake(creds, query=None, table=None, database=None, schema=No
     conn = None
     cur = None
     try:
+        # Resolve table/schema/database
+        database = database or creds.get("database")
+        schema = schema or creds.get("schema")
+        table = table or creds.get("table")
+
         # Connect
         conn = snowflake.connector.connect(
             user=creds["user"],
             password=creds["password"],
             account=creds["account"],
             warehouse=creds["warehouse"],
-            database=database or creds.get("database"),
-            schema=schema or creds.get("schema")
+            database=database,
+            schema=schema
         )
         cur = conn.cursor()
 
-        # Decide query
+        # Build query
         if query:
             sql_query = query.strip()
 
-            # If FROM is missing and table is provided, inject it before LIMIT if present
+            # Inject table if missing FROM
             if " from " not in sql_query.lower() and table:
-                table_ref = f'"{schema}"."{table}"' if schema else f'"{table}"'
+                table_ref = f'"{database}"."{schema}"."{table}"' if schema and database else f'"{table}"'
                 limit_index = sql_query.lower().find(" limit ")
                 if limit_index != -1:
                     select_part = sql_query[:limit_index].strip()
@@ -268,7 +270,7 @@ def fetch_from_snowflake(creds, query=None, table=None, database=None, schema=No
                 else:
                     sql_query = f"{sql_query} FROM {table_ref}"
         elif table:
-            table_ref = f'"{schema}"."{table}"' if schema else f'"{table}"'
+            table_ref = f'"{database}"."{schema}"."{table}"' if schema and database else f'"{table}"'
             sql_query = f"SELECT * FROM {table_ref}"
         else:
             raise ValueError("Either query or both database and table must be provided")
@@ -369,39 +371,3 @@ def fetch_from_airtable(creds, table_name, query_params_raw=None):
             "status": "error",
             "message": f"Airtable fetch failed: {str(e)}"
         }), 500
-
-def fetch_from_googlesheet(creds, query):
-    """
-    Fetch data from a Google Sheet published via the gviz API.
-    creds: dict containing at least {'sheet_id': 'https://.../gviz/tq?tq='}
-    query: SQL-like query string (e.g., "SELECT *")
-    """
-    try:
-        # Construct full URL
-        base_url = f"https://docs.google.com/spreadsheets/d/{creds['sheet_id']}/gviz/tq?tq="
-        encoded_query = urllib.parse.quote(query) # URL-encode the query string
-        url = base_url + encoded_query
-
-        response = requests.get(url)
-        response.raise_for_status()
-
-        # Google Sheets "gviz" API wraps JSON inside JS function call
-        text = response.text
-        json_start = text.find("({") + 1
-        json_end = text.rfind("})") + 1
-        raw_json = text[json_start:json_end]
-
-        data = json.loads(raw_json)
-
-        # Optional: normalize the data into list of dicts
-        table = data.get("table", {})
-        cols = [c.get("label", f"col_{i}") for i, c in enumerate(table.get("cols", []))]
-        rows = [
-            {cols[i]: (cell.get("v") if cell else None) for i, cell in enumerate(r.get("c", []))}
-            for r in table.get("rows", [])
-        ]
-
-        return rows
-
-    except Exception as e:
-        return {"status": "error", "message": f"Google Sheet fetch failed: {str(e)}"}
