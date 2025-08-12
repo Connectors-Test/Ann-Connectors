@@ -196,6 +196,14 @@ class MSSQLConnector:
         columns = [col[0] for col in self.cursor.description]
         rows = self.cursor.fetchall()
         return [dict(zip(columns, row)) for row in rows]
+    
+    def run_custom_query(self, query):
+        cursor = self.conn.cursor()
+        cursor.execute(query)
+        columns = [col[0] for col in cursor.description]
+        rows = cursor.fetchall()
+        cursor.close()
+        return [dict(zip(columns, row)) for row in rows]
 
     def close(self):
         if self.conn:

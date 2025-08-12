@@ -208,6 +208,21 @@ class MSSQLConnector:
         columns = [col[0] for col in self.cursor.description]
         rows = self.cursor.fetchall()
         return [dict(zip(columns, row)) for row in rows]
+    
+    def run_custom_query(self, query):
+        self.cursor.execute(query)
+        try:
+            columns = [desc[0] for desc in self.cursor.description]
+            rows = [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+            return rows
+        except:
+            # For queries like INSERT/UPDATE that don’t return rows
+            self.conn.commit()
+            return {"status": "success"}
+
+    def fetch_version(self):
+        self.cursor.execute("SELECT @@VERSION")
+        return self.cursor.fetchone()[0]
 
     def close(self):
         if self.conn:

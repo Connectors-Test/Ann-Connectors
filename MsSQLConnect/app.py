@@ -89,6 +89,36 @@ def preview_table(dbname, tablename):
     conn.close()
     return jsonify(result)
 
+@app.route("/query", methods=["GET"])
+def run_query():
+    db = request.args.get("db")
+    query = request.args.get("query")
+    table = request.args.get("table")
+
+    if not db or not query:
+        return jsonify({"error": "Missing db or query"}), 400
+
+    if table and "FROM" not in query.upper():
+        query = f"{query} FROM {table}"
+    
+    try:
+        conn = MSSQLConnector(password=password, database=db)
+        result = conn.run_custom_query(query)  # Implement in MSSQLConnector
+        conn.close()
+        return jsonify(result)
+    except Exception as e:
+        print("Error in /query:", e)
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/metadata", methods=["GET"])
+def get_metadata():
+    return jsonify({
+        "description": "Microsoft SQL Server connection using pyodbc.",
+        "required_credentials": ["server", "port", "user", "password", "database"],
+        "required_parameters": ["db", "table", "query"],
+        "query_type": "SQL",
+        "example_query": "SELECT TOP 10 * FROM table_name"
+    })
 
 if __name__ == "__main__":
     app.run(debug=True)
