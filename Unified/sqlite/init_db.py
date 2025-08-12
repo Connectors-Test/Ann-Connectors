@@ -18,6 +18,11 @@ CREDENTIALS = {
         "password": os.getenv("PG_PASSWORD"),
         "database": os.getenv("PG_DATABASE")
     },
+    "supabase": {
+        "uri": os.getenv("SUPABASE_URI"),
+        "schema": os.getenv("SUPABASE_SCHEMA"),
+        "table": os.getenv("SUPABASE_TABLE")
+    },
     "mysql": {
         "host": os.getenv("MYSQL_HOST"),
         "port": int(os.getenv("MYSQL_PORT")),
@@ -63,6 +68,15 @@ PRODUCT_METADATA = {
         "required_parameters": ["credentials", "query"],
         "query_type": "SQL",
         "example_query": "SELECT id, name FROM customers LIMIT 10"
+    },
+    "supabase": {
+        "description": "Supabase database connection using psycopg2. Supabase is a hosted Postgres service that requires SSL connections.",
+        "required_credentials": ["uri", "table", "schema"],  # or ["host", "port", "user", "password", "database"] if not using URI
+        "required_parameters": ["credentials", "query"],
+        "query_type": "SQL",
+        "default_schema": "public",
+        "notes": "When using URI, format should be: postgresql://<user>:<password>@<host>:<port>/<database>. SSL mode must be set to 'require'.",
+        "example_query": "SELECT id, name FROM public.customers LIMIT 10"
     },
     "mysql": {
         "description": "MySQL database connection using mysql.connector.",

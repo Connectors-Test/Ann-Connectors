@@ -40,29 +40,29 @@ def db_query_data(productType):
 
     try:
         if productType.lower() == "databricks":    
-            query = request.args.get("query", "SELECT 1")
             tableName = request.args.get("table")
             databaseName = request.args.get("database", "default")
             return fetch_from_databricks(creds, query, tableName, databaseName)
 
         elif productType.lower() == "postgresql":  
-            query = request.args.get("query", "SELECT 1")
             table = request.args.get("table")
             return fetch_from_postgresql(creds, query, table)
+        
+        elif productType.lower() == "supabase":
+            table = request.args.get("table", creds["table"])
+            schema = request.args.get("schema", creds.get("schema", "public"))
+            return fetch_from_supabase(creds, query, table, schema)
 
         elif productType.lower() == "mysql":
-            query = request.args.get("query", "SELECT 1")
             table = request.args.get("table")
             return fetch_from_mysql(creds, query, table)
         
         elif productType.lower() == "mongodb":
-            query = request.args.get("query")
             collection = request.args.get("collection")
             database = request.args.get("database")
             return fetch_from_mongodb(creds, query, collection, database)
 
         elif productType.lower() == "snowflake":
-            query = request.args.get("query")
             table = request.args.get("table")
             database = request.args.get("database")
             schema = request.args.get("schema")
@@ -70,8 +70,7 @@ def db_query_data(productType):
 
         elif productType.lower() == "airtable":
             table = request.args.get("table")
-            query_raw = request.args.get("query")
-            return fetch_from_airtable(creds, table, query_raw)
+            return fetch_from_airtable(creds, table, query)
         
         else:
             return jsonify({"status": "error", "message": "Unsupported productType"}), 400

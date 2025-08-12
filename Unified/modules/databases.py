@@ -125,6 +125,42 @@ def fetch_from_postgresql(creds, query=None, table=None, schema=None):
         if conn:
             conn.close()
 
+def fetch_from_supabase(creds, query=None, table=None, schema=None):
+    conn = None
+    cur = None
+    try:
+        conn = psycopg2.connect(creds["uri"], sslmode="require")
+        cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+        if query:
+            sql_query = query.strip()
+            if " from " not in sql_query.lower() and table:
+                table_ref = f'"{schema}"."{table}"' if schema else f'"{table}"'
+                limit_index = sql_query.lower().find(" limit ")
+                if limit_index != -1:
+                    select_part = sql_query[:limit_index].strip()
+                    limit_part = sql_query[limit_index:].strip()
+                    sql_query = f"{select_part} FROM {table_ref} {limit_part}"
+                else:
+                    sql_query = f"{sql_query} FROM {table_ref}"
+        elif table:
+            table_ref = f'"{schema}"."{table}"' if schema else f'"{table}"'
+            sql_query = f'SELECT * FROM {table_ref}'
+        else:
+            raise ValueError("Either query or both table/schema must be provided")
+
+        cur.execute(sql_query)
+        rows = cur.fetchall()
+        return [dict(row) for row in rows]
+
+    except Exception as e:
+        return {"status": "error", "message": f"Supabase fetch failed: {str(e)}"}
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
 def fetch_from_mysql(creds, query=None, table=None, schema=None):
     conn = None
     cur = None
