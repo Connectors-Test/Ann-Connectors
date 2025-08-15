@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from sqlite_loader import *
 from modules.databases import *
 from modules.spreadsheet import *
+from modules.devops_and_iot import *
 
 app = Flask(__name__)
 
@@ -108,6 +109,74 @@ def ss_query_data(productType):
         if productType.lower() == "googlesheet":
             query = request.args.get("query", "SELECT *")
             return fetch_from_googlesheet(creds, query)
+
+        else:
+            return jsonify({"status": "error", "message": "Unsupported productType"}), 400
+
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route("/query/doi/<productType>", methods=["GET"])
+def doi_query_data(productType):
+    # main query parameter — different DoI products may interpret it differently
+    query = request.args.get("query")
+    userid = request.args.get("userid")
+
+    if not query:
+        return jsonify({"status": "error", "message": "query parameter is required"}), 400
+
+    # Fetch credentials dynamically
+    if userid:
+        creds_entry = fetch_doi_credentials(user_id=userid)
+        if isinstance(creds_entry, list):
+            creds_entry = next((item for item in creds_entry if item['name'].lower() == productType.lower()), None)
+    else:
+        creds_list = fetch_doi_credentials()
+        creds_entry = next((item for item in creds_list if item['name'].lower() == productType.lower()), None)
+
+    if not creds_entry:
+        return jsonify({"status": "error", "message": "Invalid productType"}), 400
+
+    creds = creds_entry['credentials']
+
+    try:
+        if productType.lower() == "clickhouse":
+            # table = request.args.get("table")
+            # database = request.args.get("database", creds.get("database", "default"))
+            return fetch_from_clickhouse(creds, query)
+
+        elif productType.lower() == "tempo":
+            # Example: query_range param contains JSON body for trace search
+            return fetch_from_tempo(creds, query)
+
+        elif productType.lower() == "loki":
+            # query is a LogQL string
+            minutes = request.args.get("minutes", 5)
+            return fetch_from_loki(creds, query, minutes)
+
+        elif productType.lower() == "prometheus":
+            # query is a PromQL string
+            return fetch_from_prometheus(creds, query)
+
+        elif productType.lower() == "influxdb":
+            # query is a Flux query
+            # org = request.args.get("org", creds["org"])
+            # bucket = request.args.get("bucket", creds["bucket"])
+            return fetch_from_influxdb(creds, query)
+
+        elif productType.lower() == "timescaledb":
+            # table = request.args.get("table")
+            return fetch_from_timescaledb(creds, query)
+
+        elif productType.lower() == "redis":
+            # query is a Redis command, e.g., "LRANGE logs 0 10"
+            args_str = request.args.get("args", "")
+            return fetch_from_redis(creds, query, args_str)
+
+        elif productType.lower() == "elasticsearch":
+            # query param should be JSON DSL
+            index = request.args.get("index", creds.get("default_index", "_all"))
+            return fetch_from_elasticsearch(creds, query, index)
 
         else:
             return jsonify({"status": "error", "message": "Unsupported productType"}), 400
