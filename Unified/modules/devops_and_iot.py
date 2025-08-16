@@ -5,9 +5,6 @@ from elasticsearch import Elasticsearch
 import time
 from influxdb_client import InfluxDBClient
 
-# ------------------------
-# ClickHouse - SQL over HTTP/Native
-# ------------------------
 def fetch_from_clickhouse(creds, query):
     """
     creds: { 'base_url': str, 'user': str, 'password': str, 'database': str (optional) }
@@ -23,7 +20,7 @@ def fetch_from_clickhouse(creds, query):
             params['database'] = creds['database']
 
         resp = requests.post(
-            creds['base_url'],  # Should already have https://...:8443
+            creds['base_url'], 
             params=params,
             data=query.encode("utf-8"),  # Explicit encoding for safety
             auth=(creds['user'], creds['password']),
@@ -35,9 +32,6 @@ def fetch_from_clickhouse(creds, query):
     except Exception as e:
         return {"status": "error", "message": f"ClickHouse fetch failed: {str(e)}"}
 
-# ------------------------
-# Tempo - JSON GET to /api/search or /api/traces
-# ------------------------
 def fetch_from_tempo(creds, query, endpoint="search"):
     """
     creds: { 'base_url': str, 'username': str, 'api_token': str }
@@ -53,10 +47,12 @@ def fetch_from_tempo(creds, query, endpoint="search"):
         return {"status": "error", "message": f"Tempo fetch failed: {str(e)}"}
 
 
-# ------------------------
-# Loki - GET /loki/api/v1/query or /query_range
-# ------------------------
 def fetch_from_loki(creds, query, minutes):
+    """
+    creds: { 'base_url': str, 'username': str, 'api_token': str }
+    query: LogQL query string
+    minutes: number of minutes to look back for logs
+    """
     try:
         url = f"{creds['base_url']}/loki/api/v1/query_range"
         end = int(time.time() * 1e9)  # nanoseconds
@@ -75,9 +71,6 @@ def fetch_from_loki(creds, query, minutes):
     except Exception as e:
         return {"status": "error", "message": f"Loki fetch failed: {str(e)}"}
 
-# ------------------------
-# Prometheus - GET /api/v1/query
-# ------------------------
 def fetch_from_prometheus(creds, query):
     """
     creds: { 'base_url': str, 'username': str, 'api_token': str }
@@ -91,9 +84,6 @@ def fetch_from_prometheus(creds, query):
     except Exception as e:
         return {"status": "error", "message": f"Prometheus fetch failed: {str(e)}"}
     
-# ------------------------
-# InfluxDB - POST Flux query to /api/v2/query
-# ------------------------
 def fetch_from_influxdb(creds, flux_query):
     """
     creds: { 'url': str, 'token': str, 'bucket': str, 'org': str }
@@ -111,9 +101,6 @@ def fetch_from_influxdb(creds, flux_query):
     except Exception as e:
         return {"status": "error", "message": f"InfluxDB fetch failed: {str(e)}"}
 
-# ------------------------
-# TimescaleDB - PostgreSQL SQL execution
-# ------------------------
 def fetch_from_timescaledb(creds, query):
     """
     creds: { 'host': str, 'port': int, 'user': str, 'password': str, 'database': str }
@@ -141,9 +128,6 @@ def fetch_from_timescaledb(creds, query):
         if conn:
             conn.close()
 
-# ------------------------
-# Redis - direct command execution
-# ------------------------
 def fetch_from_redis(creds, command, args_str=""):
     """
     creds: { 'host': str, 'port': int, 'username': str (optional), 'password': str (optional) }
@@ -169,9 +153,6 @@ def fetch_from_redis(creds, command, args_str=""):
     except Exception as e:
         return {"status": "error", "message": f"Redis fetch failed: {str(e)}"}
     
-# ------------------------
-# Elasticsearch - POST DSL to /{index}/_search
-# ------------------------
 def fetch_from_elasticsearch(creds, dsl_query, index):
     """
     creds: { 'cloud_id': str, 'user': str, 'password': str }

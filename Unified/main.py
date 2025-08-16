@@ -3,6 +3,7 @@ from sqlite_loader import *
 from modules.databases import *
 from modules.spreadsheet import *
 from modules.devops_and_iot import *
+from modules.ecommerce import *
 
 app = Flask(__name__)
 
@@ -160,8 +161,6 @@ def doi_query_data(productType):
 
         elif productType.lower() == "influxdb":
             # query is a Flux query
-            # org = request.args.get("org", creds["org"])
-            # bucket = request.args.get("bucket", creds["bucket"])
             return fetch_from_influxdb(creds, query)
 
         elif productType.lower() == "timescaledb":
@@ -177,6 +176,55 @@ def doi_query_data(productType):
             # query param should be JSON DSL
             index = request.args.get("index", creds.get("default_index", "_all"))
             return fetch_from_elasticsearch(creds, query, index)
+
+        else:
+            return jsonify({"status": "error", "message": "Unsupported productType"}), 400
+
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+    
+@app.route("/query/ecom/<productType>", methods=["GET"])
+def ecom_query_data(productType):
+    endpoint = request.args.get("endpoint")
+    params = request.args.get("params", "{}")
+    userid = request.args.get("userid")
+    scope = request.args.get("scope")
+
+    if not endpoint:
+        return jsonify({"status": "error", "message": "endpoint parameter is required"}), 400
+
+    # Parse params if sent as JSON string
+    try:
+        params = json.loads(params)
+    except:
+        return jsonify({"status": "error", "message": "params must be a valid JSON string"}), 400
+
+    # Fetch credentials dynamically based on userid or fallback
+    if userid:
+        creds_entry = fetch_ecom_credentials(user_id=userid)  # should return list/dict of ecom credentials
+        if isinstance(creds_entry, list):
+            creds_entry = next((item for item in creds_entry if item['name'].lower() == productType.lower()), None)
+    else:
+        creds_list = fetch_ecom_credentials()
+        creds_entry = next((item for item in creds_list if item['name'].lower() == productType.lower()), None)
+
+    if not creds_entry:
+        return jsonify({"status": "error", "message": "Invalid productType"}), 400
+
+    creds = creds_entry['credentials']
+
+    try:
+        if productType.lower() == "zoho":
+            return fetch_from_zoho(creds, endpoint, params)
+
+        elif productType.lower() == "wix":
+            return fetch_from_wix(creds, endpoint, params, scope)
+
+        elif productType.lower() == "woocommerce":
+            return fetch_from_woocommerce(creds, endpoint, params)
+
+        elif productType.lower() == "shopify":
+            return fetch_from_shopify(creds, endpoint, params)
 
         else:
             return jsonify({"status": "error", "message": "Unsupported productType"}), 400

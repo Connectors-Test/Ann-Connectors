@@ -128,6 +128,16 @@ def fetch_from_postgresql(creds, query=None, table=None, schema=None):
             conn.close()
 
 def fetch_from_supabase(creds, query=None, table=None, schema=None):
+    """
+    Fetch data from Supabase using either a query or table reference.
+    Args:
+        creds (dict): Must have 'uri' for Supabase connection.
+        query (str, optional): SQL query string.
+        table (str, optional): Table name to fetch data from.
+        schema (str, optional): Schema name if not provided in creds.
+    Returns:
+        list[dict]: Query results as list of dicts.
+    """
     conn = None
     cur = None
     try:
@@ -164,6 +174,16 @@ def fetch_from_supabase(creds, query=None, table=None, schema=None):
             conn.close()
 
 def fetch_from_mysql(creds, query=None, table=None, schema=None):
+    """
+    Fetch data from MySQL using a query or collection reference.
+    Args:
+        creds (dict): Must have 'host', 'port', 'user', 'password', 'database'.
+        query (str, optional): SQL query string.
+        table (str, optional): Table name to fetch data from.
+        schema (str, optional): Schema name if not provided in creds.
+    Returns:
+        list[dict]: Query results as list of dicts.
+    """
     conn = None
     cur = None
     try:
@@ -227,6 +247,16 @@ def serialize_document(doc):                                      # For formatti
     return doc
 
 def fetch_from_mongodb(creds, query=None, collection=None, database=None, limit=None):
+    """
+    Fetch data from MongoDB using a query or collection reference.
+    Args:
+        creds (dict): Must have 'uri' for MongoDB connection.
+        query (str or dict, optional): MongoDB query as JSON string or dict.
+        collection (str, optional): Collection name to fetch data from.
+        database (str, optional): Database name if not provided in creds.
+    Returns:
+        list[dict]: Query results as list of dicts.
+    """
     client = None
     try:
         # Connect
@@ -274,6 +304,17 @@ def fetch_from_mongodb(creds, query=None, collection=None, database=None, limit=
 import snowflake.connector
 
 def fetch_from_snowflake(creds, query=None, table=None, database=None, schema=None):
+    """
+    Fetch data from Snowflake using either a query or table reference.
+    Args:
+        creds (dict): Must have 'user', 'password', 'account', 'warehouse', 'database', 'schema'.
+        query (str, optional): SQL query string.
+        table (str, optional): Table name to fetch data from.
+        database (str, optional): Database name if not provided in creds.
+        schema (str, optional): Schema name if not provided in creds.
+    Returns:
+        list[dict]: Query results as list of dicts.
+    """
     conn = None
     cur = None
     try:

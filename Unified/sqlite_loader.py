@@ -12,3 +12,6 @@ def fetch_ss_credentials(user_id=None, uuid=None):
 
 def fetch_doi_credentials(user_id=None, uuid=None):
     return get_credentials(DB_PATH, "DoI_connector_credentials", userid=user_id, uuid=uuid)
+
+def fetch_ecom_credentials(user_id=None, uuid=None):
+    return get_credentials(DB_PATH, "Ecom_connector_credentials", userid=user_id, uuid=uuid)
