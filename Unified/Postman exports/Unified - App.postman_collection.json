@@ -1,0 +1,186 @@
+{
+	"info": {
+		"_postman_id": "fb33f1b7-cd81-43e6-86ff-2691fead9a81",
+		"name": "Unified - App",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "46983115",
+		"_collection_link": "https://spacecraft-architect-20508722-5474214.postman.co/workspace/Ann-Krupa-Thomas's-Workspace~1f89a112-7de9-4162-8cf8-104b29c78c18/collection/46983115-fb33f1b7-cd81-43e6-86ff-2691fead9a81?action=share&source=collection_link&creator=46983115"
+	},
+	"item": [
+		{
+			"name": "Zoho",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/query/app/zoho?app_type=crm&endpoint=Leads&params={\"page\":1,\"per_page\":5}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"query",
+						"app",
+						"zoho"
+					],
+					"query": [
+						{
+							"key": "app_type",
+							"value": "crm"
+						},
+						{
+							"key": "endpoint",
+							"value": "Leads"
+						},
+						{
+							"key": "params",
+							"value": "{\"page\":1,\"per_page\":5}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Freshworks",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/query/app/freshworks?app_type=freshdesk&endpoint=tickets&method=GET&params={\"status\":\"2\"}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"query",
+						"app",
+						"freshworks"
+					],
+					"query": [
+						{
+							"key": "app_type",
+							"value": "freshdesk"
+						},
+						{
+							"key": "endpoint",
+							"value": "tickets"
+						},
+						{
+							"key": "method",
+							"value": "GET"
+						},
+						{
+							"key": "params",
+							"value": "{\"status\":\"2\"}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Odoo",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/query/app/odoo?model=res.partner&method=search_read&args=[[]]&kwargs={\"fields\":[\"name\",\"email\"],\"limit\":5}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"query",
+						"app",
+						"odoo"
+					],
+					"query": [
+						{
+							"key": "model",
+							"value": "res.partner"
+						},
+						{
+							"key": "method",
+							"value": "search_read"
+						},
+						{
+							"key": "args",
+							"value": "[[]]"
+						},
+						{
+							"key": "kwargs",
+							"value": "{\"fields\":[\"name\",\"email\"],\"limit\":5}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Service Now",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/query/app/servicenow?endpoint=table/incident&params={\"sysparm_limit\":5}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"query",
+						"app",
+						"servicenow"
+					],
+					"query": [
+						{
+							"key": "endpoint",
+							"value": "table/incident"
+						},
+						{
+							"key": "params",
+							"value": "{\"sysparm_limit\":5}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SAP",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/query/app/sap?producttype=product&subproducttype=API_PRODUCT_SRV",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"query",
+						"app",
+						"sap"
+					],
+					"query": [
+						{
+							"key": "producttype",
+							"value": "product"
+						},
+						{
+							"key": "subproducttype",
+							"value": "API_PRODUCT_SRV"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

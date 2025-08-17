@@ -1,0 +1,236 @@
+{
+	"info": {
+		"_postman_id": "be0934cb-945e-4ac2-a878-84ea8b8e4f24",
+		"name": "Unified - Ecom",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "46983115",
+		"_collection_link": "https://spacecraft-architect-20508722-5474214.postman.co/workspace/Ann-Krupa-Thomas's-Workspace~1f89a112-7de9-4162-8cf8-104b29c78c18/collection/46983115-be0934cb-945e-4ac2-a878-84ea8b8e4f24?action=share&source=collection_link&creator=46983115"
+	},
+	"item": [
+		{
+			"name": "Zoho get refresh token",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "authorization_code",
+							"type": "text"
+						},
+						{
+							"key": "client_id",
+							"value": "1000.Z48VK03KB4TDSAQOQLTQ8D8QNRN4YO",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "d788e04b6bae5804f912b38b438809296692710e27",
+							"type": "text"
+						},
+						{
+							"key": "redirect_uri",
+							"value": "http://localhost:8000/callback",
+							"type": "text"
+						},
+						{
+							"key": "code",
+							"value": "1000.c48a7164ce3d3f99d5b0fe602200f654.36b7d36cd9763c46c0898d6de5573c95",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://accounts.zoho.in/oauth/v2/token",
+					"protocol": "https",
+					"host": [
+						"accounts",
+						"zoho",
+						"in"
+					],
+					"path": [
+						"oauth",
+						"v2",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Wix direct test",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{Wix new api key}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "wix-account-id",
+						"value": "ea60f313-a438-44b9-8a20-790a369d0077",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://www.wixapis.com/site-list/v2/sites/query",
+					"protocol": "https",
+					"host": [
+						"www",
+						"wixapis",
+						"com"
+					],
+					"path": [
+						"site-list",
+						"v2",
+						"sites",
+						"query"
+					]
+				},
+				"description": "## API Request: Query Sites\n\nThis endpoint allows you to query for sites associated with your account on the Wix platform. It is designed to retrieve a list of sites based on specified criteria.\n\n### Request\n\n- **Method:** POST\n    \n- **URL:** `https://www.wixapis.com/site-list/v2/sites/query`\n    \n- **Headers:**\n    \n    - `Content-Type: application/json` (Ensure that the request body is formatted as JSON)\n        \n    - `Authorization: Bearer {your_access_token}` (Replace `{your_access_token}` with a valid access token)\n        \n\n### Request Body\n\nThe request body must be in JSON format. Currently, the expected structure is empty (`{}`), indicating that no specific parameters are required for the query. However, it is advisable to check the API documentation for any updates on query parameters that may be supported in the future.\n\n### Response\n\n- **Status Code:** 403\n    \n- **Content-Type:** text/html\n    \n\nThe response indicates that the request was forbidden, meaning that the user does not have the necessary permissions to access this resource. Ensure that the authentication token is valid and that the requesting user has the appropriate permissions to query sites.\n\n### Important Notes\n\n- Always include the required headers, especially the `Authorization` header, to avoid permission issues.\n    \n- Review the API documentation for any additional parameters or changes that may affect the request and response structure."
+			},
+			"response": []
+		},
+		{
+			"name": "Shopify",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/query/ecom/shopify?endpoint=products.json&params={\"limit\":5}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"query",
+						"ecom",
+						"shopify"
+					],
+					"query": [
+						{
+							"key": "endpoint",
+							"value": "products.json"
+						},
+						{
+							"key": "params",
+							"value": "{\"limit\":5}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "WooCommerce",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/query/ecom/woocommerce?endpoint=products&params={\"per_page\":5}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"query",
+						"ecom",
+						"woocommerce"
+					],
+					"query": [
+						{
+							"key": "endpoint",
+							"value": "products"
+						},
+						{
+							"key": "params",
+							"value": "{\"per_page\":5}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Zoho",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/query/ecom/zoho?endpoint=contacts&params={\"per_page\":5}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"query",
+						"ecom",
+						"zoho"
+					],
+					"query": [
+						{
+							"key": "endpoint",
+							"value": "contacts"
+						},
+						{
+							"key": "params",
+							"value": "{\"per_page\":5}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Wix",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/query/ecom/wix?endpoint=site-list/v2/sites/query&scope=account",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"query",
+						"ecom",
+						"wix"
+					],
+					"query": [
+						{
+							"key": "endpoint",
+							"value": "site-list/v2/sites/query"
+						},
+						{
+							"key": "scope",
+							"value": "account"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

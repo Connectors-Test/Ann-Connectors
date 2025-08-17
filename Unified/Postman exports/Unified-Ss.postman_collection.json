@@ -1,0 +1,38 @@
+{
+	"info": {
+		"_postman_id": "0a40d809-8635-4372-8773-c66b3d7f934d",
+		"name": "Unified-Ss",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "46983115",
+		"_collection_link": "https://spacecraft-architect-20508722-5474214.postman.co/workspace/Ann-Krupa-Thomas's-Workspace~1f89a112-7de9-4162-8cf8-104b29c78c18/collection/46983115-0a40d809-8635-4372-8773-c66b3d7f934d?action=share&source=collection_link&creator=46983115"
+	},
+	"item": [
+		{
+			"name": "googlesheet",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/query/ss/googlesheet?query=SELECT%20*",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"query",
+						"ss",
+						"googlesheet"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "SELECT%20*"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

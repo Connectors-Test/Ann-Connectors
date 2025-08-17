@@ -1,0 +1,238 @@
+{
+	"info": {
+		"_postman_id": "cd5e8065-dd09-4dd4-a23c-887753082505",
+		"name": "Unified-DoI",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "46983115",
+		"_collection_link": "https://spacecraft-architect-20508722-5474214.postman.co/workspace/Ann-Krupa-Thomas's-Workspace~1f89a112-7de9-4162-8cf8-104b29c78c18/collection/46983115-cd5e8065-dd09-4dd4-a23c-887753082505?action=share&source=collection_link&creator=46983115"
+	},
+	"item": [
+		{
+			"name": "Elasticsearch",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/query/doi/elasticsearch?query=%7B%22query%22%3A%7B%22match_all%22%3A%7B%7D%7D%7D",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"query",
+						"doi",
+						"elasticsearch"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "%7B%22query%22%3A%7B%22match_all%22%3A%7B%7D%7D%7D"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Tempo",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/query/doi/tempo?query={\"serviceName\":\"checkout\",\"start\":\"-5m\",\"end\":\"now\"}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"query",
+						"doi",
+						"tempo"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "{\"serviceName\":\"checkout\",\"start\":\"-5m\",\"end\":\"now\"}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Loki",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/query/doi/loki?query={app=\"api\"}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"query",
+						"doi",
+						"loki"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "{app=\"api\"}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Prometheus",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/query/doi/prometheus?query=rate(http_requests_total[5m])",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"query",
+						"doi",
+						"prometheus"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "rate(http_requests_total[5m])"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Clickhouse",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/query/doi/clickhouse?query=SELECT *",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"query",
+						"doi",
+						"clickhouse"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "SELECT *"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TimeScale",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/query/doi/timescaledb?query=SELECT * FROM sensor_data LIMIT 10",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"query",
+						"doi",
+						"timescaledb"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "SELECT * FROM sensor_data LIMIT 10"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Redis",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/query/doi/redis?query=GET&args=my_key",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"query",
+						"doi",
+						"redis"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "GET"
+						},
+						{
+							"key": "args",
+							"value": "my_key"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "InfluxDB",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/query/doi/influxdb?query=from(bucket:%20%22DevOps%22)%20%7C%3E%20range(start:%20-1h)%20%7C%3E%20limit(n:%2010)&org=your_org_name",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"query",
+						"doi",
+						"influxdb"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "from(bucket:%20%22DevOps%22)%20%7C%3E%20range(start:%20-1h)%20%7C%3E%20limit(n:%2010)"
+						},
+						{
+							"key": "org",
+							"value": "your_org_name"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

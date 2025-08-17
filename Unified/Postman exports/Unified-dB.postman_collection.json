@@ -1,0 +1,272 @@
+{
+	"info": {
+		"_postman_id": "fdab0417-2ee4-4dc3-a45c-a15ae51d03b9",
+		"name": "Unified-dB",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "46983115",
+		"_collection_link": "https://spacecraft-architect-20508722-5474214.postman.co/workspace/Ann-Krupa-Thomas's-Workspace~1f89a112-7de9-4162-8cf8-104b29c78c18/collection/46983115-fdab0417-2ee4-4dc3-a45c-a15ae51d03b9?action=share&source=collection_link&creator=46983115"
+	},
+	"item": [
+		{
+			"name": "postgreSQL",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/query/db/postgresql?query=SELECT%20*%20LIMIT%2010&table=DevOps",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"query",
+						"db",
+						"postgresql"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "SELECT%20*%20LIMIT%2010"
+						},
+						{
+							"key": "table",
+							"value": "DevOps"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "databricks",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/query/db/databricks?query=SELECT%20*%20LIMIT%2010&table=DevOps",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"query",
+						"db",
+						"databricks"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "SELECT%20*%20LIMIT%2010"
+						},
+						{
+							"key": "table",
+							"value": "DevOps"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "databricks using uuid",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/query/databricks?uuid=87f17736-51a6-4bc2-97c7-6695fe34090c&query=SELECT%20*%20LIMIT%2010&table=DevOps",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"query",
+						"databricks"
+					],
+					"query": [
+						{
+							"key": "uuid",
+							"value": "87f17736-51a6-4bc2-97c7-6695fe34090c"
+						},
+						{
+							"key": "query",
+							"value": "SELECT%20*%20LIMIT%2010"
+						},
+						{
+							"key": "table",
+							"value": "DevOps"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "airtable",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/query/db/airtable?table=DevOps&query={%22maxRecords%22:5,%22filterByFormula%22:%22{Deployments}%20%3E%200%22,%22sort[0][field]%22:%22Date%22}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"query",
+						"db",
+						"airtable"
+					],
+					"query": [
+						{
+							"key": "table",
+							"value": "DevOps"
+						},
+						{
+							"key": "query",
+							"value": "{%22maxRecords%22:5,%22filterByFormula%22:%22{Deployments}%20%3E%200%22,%22sort[0][field]%22:%22Date%22}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "mongoDB",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/query/db/mongodb?query=%7B%22Active%20Builds%22%3A%7B%22%24gt%22%3A1%7D%7D&limit=5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"query",
+						"db",
+						"mongodb"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "%7B%22Active%20Builds%22%3A%7B%22%24gt%22%3A1%7D%7D"
+						},
+						{
+							"key": "limit",
+							"value": "5"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Snowflake",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/query/db/snowflake?query=SELECT+*+LIMIT+5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"query",
+						"db",
+						"snowflake"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "SELECT+*+LIMIT+5"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "mySQL",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/query/db/mysql?query=SELECT%20*%20LIMIT%2010&table=DevOps\n",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"query",
+						"db",
+						"mysql"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "SELECT%20*%20LIMIT%2010"
+						},
+						{
+							"key": "table",
+							"value": "DevOps\n"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Supabase",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/query/db/supabase?query=SELECT%20*%20LIMIT%2010&table=DevOps",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"query",
+						"db",
+						"supabase"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "SELECT%20*%20LIMIT%2010"
+						},
+						{
+							"key": "table",
+							"value": "DevOps"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Neo4j",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	]
+}

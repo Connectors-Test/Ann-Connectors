@@ -317,22 +317,30 @@ def app_query_data(productType):
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
-@app.route("/metadata", methods=["GET"])
-def get_metadata():
-    db_creds = fetch_db_credentials()
-    product_type = request.args.get("productType")
+@app.route("/metadata/<category>/<product_type>", methods=["GET"])
+def get_metadata(category, product_type):
+    # Map categories to fetchers
+    fetchers = {
+        "db": fetch_db_credentials,
+        "ss": fetch_ss_credentials,
+        "doi": fetch_doi_credentials,
+        "ecom": fetch_ecom_credentials,
+        "app": fetch_app_credentials
+    }
+
+    if category not in fetchers:
+        return jsonify({"status": "error", "message": "Invalid category"}), 400
+
+    creds_list = fetchers[category]()
+    metadata_map = {c["name"].lower(): c.get("metadata", {}) for c in creds_list}
 
     if product_type:
-        for db in db_creds:
-            if db["name"].lower() == product_type.lower():
-                return jsonify({"status": "success", "data": db["metadata"]})
-        return jsonify({"status": "error", "message": "Invalid productType"}), 400
+        data = metadata_map.get(product_type.lower())
+        if not data:
+            return jsonify({"status": "error", "message": "Invalid productType"}), 400
+        return jsonify({"status": "success", "data": data})
 
-    # Return metadata for all product types
-    all_metadata = {
-        db["name"]: db["metadata"] for db in db_creds
-    }
-    return jsonify({"status": "success", "data": all_metadata})
+    return jsonify({"status": "success", "data": metadata_map})
 
 if __name__ == "__main__":
     app.run(debug=True)
