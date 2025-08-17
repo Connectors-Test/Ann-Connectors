@@ -10,7 +10,7 @@ import mysql.connector
 from neo4j import GraphDatabase
 from neo4j.time import DateTime
 
-def fetch_from_databricks(creds, query=None, table=None, database=None):
+def fetch_from_databricks(creds, query=None):
     conn = None
     cursor = None
     try:
@@ -22,33 +22,10 @@ def fetch_from_databricks(creds, query=None, table=None, database=None):
         )
         cursor = conn.cursor()
 
-        # Decide query
-        if query:
-            # Normalize spaces
-            query_clean = " ".join(query.strip().split())
-            query_lower = query_clean.lower()
+        if not query:
+            raise ValueError("Query must be provided")
 
-            # If FROM is missing, inject it before LIMIT (if present) from query arguments
-            if "from" not in query_lower:
-                if not (database and table):
-                    raise ValueError("Query missing FROM clause and database/table not provided")
-                
-                if "limit" in query_lower:
-                    limit_index = query_lower.index("limit")
-                    before_limit = query_clean[:limit_index].strip()
-                    after_limit = query_clean[limit_index:].strip()
-                    query_clean = f"{before_limit} FROM {database}.{table} {after_limit}"
-                    
-                else:
-                    query_clean = f"{query_clean} FROM {database}.{table}"
-            sql_query = query_clean
-
-        elif database and table:
-            sql_query = f"SELECT * FROM {database}.{table}"
-        else:
-            raise ValueError("Either query or both database and table must be provided")
-
-        cursor.execute(sql_query)
+        cursor.execute(query)
 
         # Extract results
         columns = [col[0] for col in cursor.description]
@@ -68,7 +45,7 @@ def fetch_from_databricks(creds, query=None, table=None, database=None):
         if conn:
             conn.close()
 
-def fetch_from_postgresql(creds, query=None, table=None, schema=None):
+def fetch_from_postgresql(creds, query=None):
     conn = None
     cur = None
     try:
@@ -85,30 +62,11 @@ def fetch_from_postgresql(creds, query=None, table=None, schema=None):
         cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
         # Decide query
-        if query:
-            sql_query = query.strip()
-
-            # If query has no FROM and table is provided, add FROM before LIMIT
-            if " from " not in sql_query.lower() and table:
-                table_ref = f'"{schema}"."{table}"' if schema else f'"{table}"'
-
-                # Case 1: Query already has LIMIT — we must insert FROM before it
-                limit_index = sql_query.lower().find(" limit ")
-                if limit_index != -1:
-                    select_part = sql_query[:limit_index].strip()  # before LIMIT
-                    limit_part = sql_query[limit_index:].strip()   # the LIMIT itself
-                    sql_query = f"{select_part} FROM {table_ref} {limit_part}"
-                else:
-                    sql_query = f"{sql_query} FROM {table_ref}"
-
-        elif table:
-            table_ref = f'"{schema}"."{table}"' if schema else f'"{table}"'
-            sql_query = f'SELECT * FROM {table_ref}'
-        else:
-            raise ValueError("Either query or both database and table must be provided")
+        if not query:
+            raise ValueError("Query must be provided")
 
         # Execute
-        cur.execute(sql_query)
+        cur.execute(query)
         rows = cur.fetchall()
 
         # Convert to list of dicts
@@ -127,14 +85,12 @@ def fetch_from_postgresql(creds, query=None, table=None, schema=None):
         if conn:
             conn.close()
 
-def fetch_from_supabase(creds, query=None, table=None, schema=None):
+def fetch_from_supabase(creds, query=None):
     """
     Fetch data from Supabase using either a query or table reference.
     Args:
         creds (dict): Must have 'uri' for Supabase connection.
         query (str, optional): SQL query string.
-        table (str, optional): Table name to fetch data from.
-        schema (str, optional): Schema name if not provided in creds.
     Returns:
         list[dict]: Query results as list of dicts.
     """
@@ -144,24 +100,10 @@ def fetch_from_supabase(creds, query=None, table=None, schema=None):
         conn = psycopg2.connect(creds["uri"], sslmode="require")
         cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-        if query:
-            sql_query = query.strip()
-            if " from " not in sql_query.lower() and table:
-                table_ref = f'"{schema}"."{table}"' if schema else f'"{table}"'
-                limit_index = sql_query.lower().find(" limit ")
-                if limit_index != -1:
-                    select_part = sql_query[:limit_index].strip()
-                    limit_part = sql_query[limit_index:].strip()
-                    sql_query = f"{select_part} FROM {table_ref} {limit_part}"
-                else:
-                    sql_query = f"{sql_query} FROM {table_ref}"
-        elif table:
-            table_ref = f'"{schema}"."{table}"' if schema else f'"{table}"'
-            sql_query = f'SELECT * FROM {table_ref}'
-        else:
-            raise ValueError("Either query or both table/schema must be provided")
+        if not query:
+            raise ValueError("Query must be provided")
 
-        cur.execute(sql_query)
+        cur.execute(query)
         rows = cur.fetchall()
         return [dict(row) for row in rows]
 
@@ -173,14 +115,12 @@ def fetch_from_supabase(creds, query=None, table=None, schema=None):
         if conn:
             conn.close()
 
-def fetch_from_mysql(creds, query=None, table=None, schema=None):
+def fetch_from_mysql(creds, query=None):
     """
     Fetch data from MySQL using a query or collection reference.
     Args:
         creds (dict): Must have 'host', 'port', 'user', 'password', 'database'.
         query (str, optional): SQL query string.
-        table (str, optional): Table name to fetch data from.
-        schema (str, optional): Schema name if not provided in creds.
     Returns:
         list[dict]: Query results as list of dicts.
     """
@@ -197,31 +137,12 @@ def fetch_from_mysql(creds, query=None, table=None, schema=None):
         )
         cur = conn.cursor(dictionary=True)  # dictionary=True => dict rows
 
-        if table:
-            table = table.strip()
-
         # Decide query
-        if query:
-            sql_query = query.strip()
-
-            if " from " not in sql_query.lower() and table:
-                table_ref = f"`{schema}`.`{table}`" if schema else f"`{table}`"
-
-                limit_index = sql_query.lower().find(" limit ")
-                if limit_index != -1:
-                    select_part = sql_query[:limit_index].strip()
-                    limit_part = sql_query[limit_index:].strip()
-                    sql_query = f"{select_part} FROM {table_ref} {limit_part}"
-                else:
-                    sql_query = f"{sql_query} FROM {table_ref}"
-        elif table:
-            table_ref = f"`{schema}`.`{table}`" if schema else f"`{table}`"
-            sql_query = f"SELECT * FROM {table_ref}"
-        else:
-            raise ValueError("Either query or table must be provided")
+        if not query:
+            raise ValueError("Query must be provided")
 
         # Execute
-        cur.execute(sql_query)
+        cur.execute(query)
         rows = cur.fetchall()
 
         return rows  # already dicts
@@ -303,13 +224,12 @@ def fetch_from_mongodb(creds, query=None, collection=None, database=None, limit=
 
 import snowflake.connector
 
-def fetch_from_snowflake(creds, query=None, table=None, database=None, schema=None):
+def fetch_from_snowflake(creds, query=None, database=None, schema=None):
     """
     Fetch data from Snowflake using either a query or table reference.
     Args:
         creds (dict): Must have 'user', 'password', 'account', 'warehouse', 'database', 'schema'.
         query (str, optional): SQL query string.
-        table (str, optional): Table name to fetch data from.
         database (str, optional): Database name if not provided in creds.
         schema (str, optional): Schema name if not provided in creds.
     Returns:
@@ -321,7 +241,7 @@ def fetch_from_snowflake(creds, query=None, table=None, database=None, schema=No
         # Resolve table/schema/database
         database = database or creds.get("database")
         schema = schema or creds.get("schema")
-        table = table or creds.get("table")
+        table = creds.get("table")
 
         # Connect
         conn = snowflake.connector.connect(
@@ -467,9 +387,7 @@ def fetch_from_neo4j(creds, query=None, label=None):
 
     Args:
         creds (dict): Must have 'uri', 'username', 'password', 'database'.
-        query (str, optional): Cypher query string. If not provided, will auto-build from label/limit.
-        label (str, optional): Node label to query (e.g., 'DevOps').
-        limit (int, optional): Row limit.
+        query (str, optional): Cypher query string. 
 
     Returns:
         list[dict]: Query results as list of dicts.
@@ -484,9 +402,7 @@ def fetch_from_neo4j(creds, query=None, label=None):
 
         # Build query if not given
         if not query:
-            if not label:
-                raise ValueError("Either 'query' or 'label' must be provided")
-            query = f"MATCH (n:{label}) RETURN n"
+            raise ValueError("Query must be provided")
 
         # Run query
         with driver.session(database=creds.get("database", "neo4j")) as session:

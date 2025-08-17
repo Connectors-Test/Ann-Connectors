@@ -43,22 +43,16 @@ def db_query_data(productType):
 
     try:
         if productType.lower() == "databricks":    
-            tableName = request.args.get("table")
-            databaseName = request.args.get("database", "default")
-            return fetch_from_databricks(creds, query, tableName, databaseName)
+            return fetch_from_databricks(creds, query)
 
         elif productType.lower() == "postgresql":  
-            table = request.args.get("table")
-            return fetch_from_postgresql(creds, query, table)
+            return fetch_from_postgresql(creds, query)
         
         elif productType.lower() == "supabase":
-            table = request.args.get("table", creds["table"])
-            schema = request.args.get("schema", creds.get("schema", "public"))
-            return fetch_from_supabase(creds, query, table, schema)
+            return fetch_from_supabase(creds, query)
 
         elif productType.lower() == "mysql":
-            table = request.args.get("table")
-            return fetch_from_mysql(creds, query, table)
+            return fetch_from_mysql(creds, query)
         
         elif productType.lower() == "mongodb":
             collection = request.args.get("collection")
@@ -66,18 +60,16 @@ def db_query_data(productType):
             return fetch_from_mongodb(creds, query, collection, database)
 
         elif productType.lower() == "snowflake":
-            table = request.args.get("table")
             database = request.args.get("database")
             schema = request.args.get("schema")
-            return fetch_from_snowflake(creds, query, table, database, schema)
+            return fetch_from_snowflake(creds, query, database, schema)
 
         elif productType.lower() == "airtable":
             table = request.args.get("table")
             return fetch_from_airtable(creds, table, query)
         
         elif productType.lower() == "neo4j":
-            label = request.args.get("label", None)
-            return fetch_from_neo4j(creds, query, label)
+            return fetch_from_neo4j(creds, query)
         
         else:
             return jsonify({"status": "error", "message": "Unsupported productType"}), 400
