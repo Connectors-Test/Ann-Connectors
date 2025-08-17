@@ -302,6 +302,18 @@ def app_query_data(productType):
             field = request.args.get("field")
             filters = request.args.get("filters")
             return fetch_from_sap(creds, producttype, subproducttype, field, filters)
+        
+        # HubSpot
+        elif pt == "hubspot":
+            app_type = request.args.get("app_type", "contacts")
+            endpoint = request.args.get("endpoint")
+            params = request.args.get("params", "{}")
+            try:
+                params = json.loads(params)
+            except:
+                return jsonify({"status": "error", "message": "params must be a valid JSON string"}), 400
+
+            return fetch_from_hubspot(creds, app_type, endpoint, params)
 
         else:
             return jsonify({"status": "error", "message": "Unsupported productType"}), 400

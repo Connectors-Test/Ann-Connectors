@@ -215,3 +215,21 @@ def fetch_from_sap(creds, producttype, subproducttype, field=None, filters=None)
         return r.json(), r.status_code
     except requests.exceptions.RequestException as e:
         return {"status": "error", "message": f"SAP fetch failed: {str(e)}"}, 500
+    
+def fetch_from_hubspot(creds, app_type, endpoint, params=None, method="GET"):
+    base_url = "https://api.hubapi.com"
+    headers = {"Authorization": f"Bearer {creds['access_token']}"}
+    
+    url_map = {
+        "contacts": "/crm/v3/objects/contacts",
+        "companies": "/crm/v3/objects/companies",
+        "deals": "/crm/v3/objects/deals",
+        "tickets": "/crm/v3/objects/tickets",
+    }
+    
+    url = f"{base_url}{url_map.get(app_type,'')}"
+    if endpoint == "search":
+        url += "/search"
+    
+    resp = requests.request(method, url, headers=headers, json=params if method=="POST" else None, params=params if method=="GET" else None)
+    return resp.json()

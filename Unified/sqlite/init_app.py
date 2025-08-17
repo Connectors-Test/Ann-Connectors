@@ -36,6 +36,9 @@ APP_CREDENTIALS = {
         # "host": os.getenv("SAP_HOST"),
         # "port": os.getenv("SAP_PORT")
         "api_key": os.getenv("SAP_SANDBOX_APIKEY")
+    },
+    "hubspot": {
+        "access_token": os.getenv("HUBSPOT_ACCESS_TOKEN")
     }
 }
 
@@ -79,6 +82,14 @@ APP_METADATA = {
         "required_parameters": ["credentials", "endpoint", "params"],
         "query_type": "OData/API",
         "example_query": "/sap/opu/odata/sap/API_SALES_ORDER",
+        "method": "GET"
+    },
+    "hubspot": {
+        "description": "HubSpot API access.",
+        "required_credentials": ["access_token"],
+        "required_parameters": ["credentials", "endpoint", "params"],
+        "query_type": "REST API",
+        "example_query": "/crm/v3/objects/contacts",
         "method": "GET"
     }
 }
