@@ -125,7 +125,6 @@ DB_NAME = "wwwsmart_credentials.db"
 conn = sqlite3.connect(DB_NAME)
 conn.close()
 
-create_table(DB_NAME, "Api_connector_credentials")
 create_table(DB_NAME, "Db_connector_credentials")
 
 import uuid

@@ -4,6 +4,7 @@ from modules.databases import *
 from modules.spreadsheet import *
 from modules.devops_and_iot import *
 from modules.ecommerce import *
+from modules.applications import *
 
 app = Flask(__name__)
 
@@ -215,7 +216,7 @@ def ecom_query_data(productType):
 
     try:
         if productType.lower() == "zoho":
-            return fetch_from_zoho(creds, endpoint, params)
+            return fetch_from_zoho_crm(creds, endpoint, params)
 
         elif productType.lower() == "wix":
             return fetch_from_wix(creds, endpoint, params, scope)
@@ -225,6 +226,90 @@ def ecom_query_data(productType):
 
         elif productType.lower() == "shopify":
             return fetch_from_shopify(creds, endpoint, params)
+
+        else:
+            return jsonify({"status": "error", "message": "Unsupported productType"}), 400
+
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route("/query/app/<productType>", methods=["GET"])
+def app_query_data(productType):
+    userid = request.args.get("userid")
+    pt = productType.lower()
+
+    # Fetch credentials dynamically based on userid or fallback
+    if userid:
+        creds_entry = fetch_app_credentials(user_id=userid)
+        if isinstance(creds_entry, list):
+            creds_entry = next((item for item in creds_entry if item['name'].lower() == pt), None)
+    else:
+        creds_list = fetch_app_credentials()
+        creds_entry = next((item for item in creds_list if item['name'].lower() == pt), None)
+
+    if not creds_entry:
+        return jsonify({"status": "error", "message": "Invalid productType"}), 400
+
+    creds = creds_entry['credentials']
+
+    try:
+        # Zoho
+        if pt == "zoho":
+            app_type = request.args.get("app_type", "crm")  # default to crm
+            endpoint = request.args.get("endpoint")
+            params = request.args.get("params", "{}")
+            try:
+                params = json.loads(params)
+            except:
+                return jsonify({"status": "error", "message": "params must be a valid JSON string"}), 400
+
+            return fetch_from_zoho(creds, app_type, endpoint, params)
+
+        # Freshworks
+        elif pt == "freshworks":
+            app_type = request.args.get("app_type", "freshdesk")  # default to freshdesk
+            endpoint = request.args.get("endpoint")
+            params = request.args.get("params", "{}")
+            method = request.args.get("method")  # optional GET/POST
+            try:
+                params = json.loads(params)
+            except:
+                return jsonify({"status": "error", "message": "params must be a valid JSON string"}), 400
+
+            return fetch_from_freshworks(creds, app_type, endpoint, params, method)
+
+        # Odoo
+        elif pt == "odoo":
+            model = request.args.get("model")
+            method = request.args.get("method")
+            args = request.args.get("args", "[]")
+            kwargs = request.args.get("kwargs", "{}")
+            try:
+                args = json.loads(args)
+                kwargs = json.loads(kwargs)
+            except:
+                return jsonify({"status": "error", "message": "args/kwargs must be valid JSON"}), 400
+
+            return fetch_from_odoo(creds, model, method, args, kwargs)
+
+        # ServiceNow
+        elif pt == "servicenow":
+            endpoint = request.args.get("endpoint")
+            params = request.args.get("params", "{}")
+            try:
+                params = json.loads(params)
+            except:
+                return jsonify({"status": "error", "message": "params must be a valid JSON string"}), 400
+
+            return fetch_from_servicenow(creds, endpoint, params)
+
+        # SAP
+        elif pt == "sap":
+            producttype = request.args.get("producttype")
+            subproducttype = request.args.get("subproducttype")
+            field = request.args.get("field")
+            filters = request.args.get("filters")
+            return fetch_from_sap(creds, producttype, subproducttype, field, filters)
 
         else:
             return jsonify({"status": "error", "message": "Unsupported productType"}), 400

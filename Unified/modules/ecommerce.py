@@ -1,7 +1,7 @@
 import requests
 from flask import jsonify
 
-def fetch_from_zoho(creds, endpoint, params=None):
+def fetch_from_zoho_crm(creds, endpoint, params=None):
     """
     Fetch data from Zoho CRM API using refresh token.
 
