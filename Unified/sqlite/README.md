@@ -2,9 +2,9 @@
 
 ### Setup
 
-1. Make sure all `init_XX.py` has been run at least once to:
+1. Make sure all required files in `\init` has been run once to:
    - Create the SQLite DB (`wwwsmart_credentials.db`)
-   - Create required tables: `Api_connector_credentials`, `Db_connector_credentials`, ..
+   - Create required tables: `App_connector_credentials`, `Db_connector_credentials`, ..
    - Load credentials from env for testing
 
 2. What other files do:
