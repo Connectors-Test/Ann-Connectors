@@ -8,6 +8,13 @@ def fetch_from_googlesheet(creds, query):
     creds: dict containing at least {'sheet_id': 'https://.../gviz/tq?tq='}
     query: SQL-like query string (e.g., "SELECT *")
     """
+    if not query.strip().lower().startswith("select"):
+        return {"status": "error", "message": "Only SELECT queries are allowed"}
+
+    forbidden = ["update", "delete", "insert", "drop", "alter"]
+    if any(word in query.lower() for word in forbidden):
+        return {"status": "error", "message": "Forbidden operation in query"}
+
     try:
         # Construct full URL
         base_url = f"https://docs.google.com/spreadsheets/d/{creds['sheet_id']}/gviz/tq?tq="

@@ -10,6 +10,10 @@ def fetch_from_clickhouse(creds, query):
     creds: { 'base_url': str, 'user': str, 'password': str, 'database': str (optional) }
     query: SQL string to execute on ClickHouse
     """
+    validation = validate_sql_query(query, engine="ClickHouse")
+    if not validation["valid"]:
+        return {"status": "error", "message": validation["error"]}
+    query = validation["query"]
     try:
         # Ensure FORMAT JSON for structured output
         if not query.strip().lower().endswith("format json"):
@@ -38,6 +42,12 @@ def fetch_from_tempo(creds, query, endpoint="search"):
     query: dict for search query (serviceName, tags, etc.)
     endpoint: "search" for trace search, or "traces/{traceID}" for a specific trace
     """
+    if not isinstance(query, dict):
+        return {"status": "error", "message": "Tempo: query must be a dict"}
+
+    if endpoint != "search" and not endpoint.startswith("traces/"):
+        return {"status": "error", "message": "Tempo: invalid endpoint"}
+    
     try:
         url = f"{creds['base_url']}/api/{endpoint}"
         resp = requests.get(url, params=query, auth=(creds['username'], creds['api_token']))
@@ -53,6 +63,12 @@ def fetch_from_loki(creds, query, minutes):
     query: LogQL query string
     minutes: number of minutes to look back for logs
     """
+    if not query or not isinstance(query, str):
+        return {"status": "error", "message": "Loki: query must be a string"}
+
+    if minutes > 1440:  # max 24h lookback
+        return {"status": "error", "message": "Loki: time range too large"}
+    
     try:
         url = f"{creds['base_url']}/loki/api/v1/query_range"
         end = int(time.time() * 1e9)  # nanoseconds
@@ -76,6 +92,8 @@ def fetch_from_prometheus(creds, query):
     creds: { 'base_url': str, 'username': str, 'api_token': str }
     query: PromQL query string
     """
+    if not query or not isinstance(query, str):
+        return {"status": "error", "message": "Prometheus: query must be a string"}
     try:
         url = f"{creds['base_url']}/api/prom/api/v1/query"
         resp = requests.get(url, params={"query": query}, auth=(creds['username'], creds['api_token']))
@@ -89,6 +107,13 @@ def fetch_from_influxdb(creds, flux_query):
     creds: { 'url': str, 'token': str, 'bucket': str, 'org': str }
     flux_query: Flux language query
     """
+    if not flux_query or not isinstance(flux_query, str):
+        return {"status": "error", "message": "InfluxDB: query must be a string"}
+
+    forbidden = ["drop", "delete"]
+    if any(word in flux_query.lower() for word in forbidden):
+        return {"status": "error", "message": "InfluxDB: forbidden keyword detected"}
+    
     try:
         client = InfluxDBClient(url=creds["url"], token=creds["token"], org=creds["org"])
         query_api = client.query_api()
@@ -106,6 +131,11 @@ def fetch_from_timescaledb(creds, query):
     creds: { 'host': str, 'port': int, 'user': str, 'password': str, 'database': str }
     query: SQL query string
     """
+    if query != "LIST_TABLES":
+        validation = validate_sql_query(query, engine="TimescaleDB")
+        if not validation["valid"]:
+            return {"status": "error", "message": validation["error"]}
+        query = validation["query"]
     if query == "LIST_TABLES":
         query = "SELECT table_name FROM information_schema.tables WHERE table_schema='public';"
     conn = None
@@ -134,6 +164,10 @@ def fetch_from_redis(creds, command, args_str=""):
     command: Redis command name (string)
     args_str: comma-separated string of command arguments
     """
+    allowed_commands = {"get", "mget", "hget", "hgetall", "lrange", "scan"}
+    if command.lower() not in allowed_commands:
+        return {"status": "error", "message": f"Redis: command '{command}' not allowed"}
+
     try:
         r = redis.Redis(
             host=creds['host'],
@@ -159,6 +193,16 @@ def fetch_from_elasticsearch(creds, dsl_query, index):
     index: Elasticsearch index name
     dsl_query: dict representing Elasticsearch query DSL
     """
+    if not isinstance(dsl_query, dict):
+        return {"status": "error", "message": "Elasticsearch: query must be a dict"}
+
+    if not isinstance(index, str) or not index.strip():
+        return {"status": "error", "message": "Elasticsearch: invalid index"}
+
+    forbidden = ["delete", "update", "reindex"]
+    if any(word in str(dsl_query).lower() for word in forbidden):
+        return {"status": "error", "message": "Elasticsearch: forbidden operation detected"}
+
     try:
         es = Elasticsearch(
             cloud_id=creds["cloud_id"],
@@ -173,3 +217,35 @@ def fetch_from_elasticsearch(creds, dsl_query, index):
             "status": "error",
             "message": f"Elasticsearch fetch failed: {str(e)}"
         }
+
+
+def validate_sql_query(query: str, engine: str = "generic"):
+    """
+    Validate a SQL query to ensure safety (read-only, correct format).
+    
+    Args:
+        query (str): The SQL query string
+        engine (str): Name of the engine (used for error messages/logging)
+    
+    Returns:
+        dict: {"valid": True, "query": query} or {"valid": False, "error": "..."}
+    """
+    if not query or not query.strip():
+        return {"valid": False, "error": f"{engine}: Query must be provided"}
+    
+    lowered = query.strip().lower()
+
+    # must start with SELECT
+    if not lowered.startswith("select"):
+        return {"valid": False, "error": f"{engine}: Only SELECT queries are allowed"}
+    
+    # block forbidden keywords
+    forbidden = ["insert", "update", "delete", "drop", "alter", "truncate", "create", "grant", "revoke"]
+    if any(f" {word} " in lowered for word in forbidden):
+        return {"valid": False, "error": f"{engine}: Forbidden keyword detected"}
+    
+    # must contain FROM
+    if " from " not in lowered:
+        return {"valid": False, "error": f"{engine}: Invalid query (missing FROM clause)"}
+
+    return {"valid": True, "query": query}

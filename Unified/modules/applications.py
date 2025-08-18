@@ -15,6 +15,8 @@ def fetch_from_freshworks(creds, app_type, endpoint, params=None, method=None):
     """
     if params is None:
         params = {}
+    elif not isinstance(params, dict):
+        return {"status": "error", "message": "Invalid params format: must be a dict"}
 
     try:
         # Base URLs per app type
@@ -71,6 +73,8 @@ def fetch_from_zoho(creds, app_type, endpoint, params=None):
     """
     if params is None:
         params = {}
+    elif not isinstance(params, dict):
+        return {"status": "error", "message": "Invalid params format: must be a dict"}
 
     try:
         # Refresh access token
@@ -130,6 +134,10 @@ def fetch_from_odoo(creds, model, method, args=None, kwargs=None):
     args: list of positional arguments for the method
     kwargs: dict of keyword arguments for the method
     """
+    if args is not None and not isinstance(args, list):
+        return {"status": "error", "message": "Invalid args format: must be a list"}
+    if kwargs is not None and not isinstance(kwargs, dict):
+        return {"status": "error", "message": "Invalid kwargs format: must be a dict"}
     payload = {
         "jsonrpc": "2.0",
         "method": "call",
@@ -160,6 +168,8 @@ def fetch_from_servicenow(creds, endpoint, params=None):
     """Fetch data from ServiceNow REST API."""
     if params is None:
         params = {}
+    elif not isinstance(params, dict):
+        return {"status": "error", "message": "Invalid params format: must be a dict"}
 
     try:
         base_url = f"{creds['instance'].rstrip('/')}"
@@ -207,6 +217,8 @@ def fetch_from_sap(creds, producttype, subproducttype, field=None, filters=None)
         "APIKey": creds["api_key"],
         "Accept": "application/json"
     }
+    if filters is not None and not isinstance(filters, str):
+        return {"status": "error", "message": "Invalid filters format: must be a string"}
     params = {"$filter": filters} if filters else {}
 
     try:
@@ -230,6 +242,9 @@ def fetch_from_hubspot(creds, app_type, endpoint, params=None, method="GET"):
     url = f"{base_url}{url_map.get(app_type,'')}"
     if endpoint == "search":
         url += "/search"
+    
+    if not isinstance(params, dict):
+        return {"status": "error", "message": "Invalid params format: must be a dict"}
     
     resp = requests.request(method, url, headers=headers, json=params if method=="POST" else None, params=params if method=="GET" else None)
     return resp.json()

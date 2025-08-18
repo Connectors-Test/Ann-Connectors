@@ -14,6 +14,12 @@ def fetch_from_zoho_crm(creds, endpoint, params=None):
     endpoint: API endpoint, e.g., "Leads"
     params: optional query parameters (dict)
     """
+    if not creds.get("client_id") or not creds.get("client_secret") or not creds.get("refresh_token"):
+        return {"status": "error", "message": "Missing Zoho CRM credentials"}
+
+    if not endpoint or not isinstance(endpoint, str):
+        return {"status": "error", "message": "Invalid endpoint"}
+
     try:
         if params is None:
             params = {}
@@ -55,6 +61,9 @@ def fetch_from_wix(creds, endpoint, params=None, scope=None):
         params (dict, optional): Parameters to send with the request
         scope (str, optional): "site" or "account", determines which ID header to include
     """
+    if scope not in (None, "site", "account"):
+        return {"status": "error", "message": "Invalid scope for Wix"}
+
     if params is None:
         params = {}
 
@@ -87,6 +96,12 @@ def fetch_from_woocommerce(creds, endpoint, params=None):
     endpoint: WooCommerce API endpoint (e.g. 'products', 'orders')
     params: dict of query params
     """
+    if not all(k in creds for k in ["url", "consumer_key", "consumer_secret"]):
+        return {"status": "error", "message": "Missing WooCommerce credentials"}
+
+    if not endpoint or not isinstance(endpoint, str):
+        return {"status": "error", "message": "Invalid WooCommerce endpoint"}
+
     try:
         base_url = creds['url'].rstrip('/')
         url = f"{base_url}/wp-json/wc/v3/{endpoint.lstrip('/')}"
@@ -113,6 +128,9 @@ def fetch_from_woocommerce(creds, endpoint, params=None):
 
 def fetch_from_shopify(creds, endpoint, params=None):
     """Fetch data from Shopify REST API."""
+    if not creds.get("store_url") or not creds.get("access_token"):
+        return {"status": "error", "message": "Missing Shopify credentials"}
+
     try:
         if params is None:
             params = {}

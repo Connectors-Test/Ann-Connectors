@@ -13,6 +13,12 @@ from neo4j.time import DateTime
 def fetch_from_databricks(creds, query=None):
     conn = None
     cursor = None
+    
+    validation = validate_sql_query(query, engine="PostgreSQL")
+    if not validation["valid"]:
+        return {"status": "error", "message": validation["error"]}
+    query = validation["query"]
+
     try:
         # Connect
         conn = databricks.sql.connect(
@@ -21,9 +27,6 @@ def fetch_from_databricks(creds, query=None):
             access_token=creds["token"]
         )
         cursor = conn.cursor()
-
-        if not query:
-            raise ValueError("Query must be provided")
 
         cursor.execute(query)
 
@@ -48,6 +51,12 @@ def fetch_from_databricks(creds, query=None):
 def fetch_from_postgresql(creds, query=None):
     conn = None
     cur = None
+    
+    validation = validate_sql_query(query, engine="PostgreSQL")
+    if not validation["valid"]:
+        return {"status": "error", "message": validation["error"]}
+    query = validation["query"]
+
     try:
         # Connect
         conn = psycopg2.connect(
@@ -60,10 +69,6 @@ def fetch_from_postgresql(creds, query=None):
 
         # Use DictCursor so fetch results are dicts directly
         cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-
-        # Decide query
-        if not query:
-            raise ValueError("Query must be provided")
 
         # Execute
         cur.execute(query)
@@ -96,12 +101,15 @@ def fetch_from_supabase(creds, query=None):
     """
     conn = None
     cur = None
+    
+    validation = validate_sql_query(query, engine="PostgreSQL")
+    if not validation["valid"]:
+        return {"status": "error", "message": validation["error"]}
+    query = validation["query"]
+
     try:
         conn = psycopg2.connect(creds["uri"], sslmode="require")
         cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-
-        if not query:
-            raise ValueError("Query must be provided")
 
         cur.execute(query)
         rows = cur.fetchall()
@@ -126,6 +134,12 @@ def fetch_from_mysql(creds, query=None):
     """
     conn = None
     cur = None
+    
+    validation = validate_sql_query(query, engine="PostgreSQL")
+    if not validation["valid"]:
+        return {"status": "error", "message": validation["error"]}
+    query = validation["query"]
+
     try:
         # Connect
         conn = mysql.connector.connect(
@@ -136,10 +150,6 @@ def fetch_from_mysql(creds, query=None):
             database=creds["database"]
         )
         cur = conn.cursor(dictionary=True)  # dictionary=True => dict rows
-
-        # Decide query
-        if not query:
-            raise ValueError("Query must be provided")
 
         # Execute
         cur.execute(query)
@@ -198,7 +208,7 @@ def fetch_from_mongodb(creds, query=None, collection=None, database=None, limit=
                 elif isinstance(query, dict):
                     query_dict = query
                 else:
-                    raise ValueError("Query must be a JSON string or dict")
+                    raise ValueError("MongoDB query must be a JSON string or dict")
             except Exception as e:
                 raise ValueError(f"Invalid MongoDB query: {e}")
         else:
@@ -237,6 +247,12 @@ def fetch_from_snowflake(creds, query=None, database=None, schema=None):
     """
     conn = None
     cur = None
+    
+    validation = validate_sql_query(query, engine="PostgreSQL")
+    if not validation["valid"]:
+        return {"status": "error", "message": validation["error"]}
+    query = validation["query"]
+    
     try:
         # Resolve table/schema/database
         database = database or creds.get("database")
@@ -319,6 +335,8 @@ def fetch_from_airtable(creds, table_name, query_params_raw=None):
                 query_params = json.loads(query_params_raw)  # JSON-based query
             except json.JSONDecodeError:
                 query_params = {"filterByFormula": query_params_raw}  # formula string
+                if not isinstance(query_params_raw, str):
+                    return {"valid": False, "error": "Airtable params must be JSON or formula string"}
 
         all_records = []
         offset = None
@@ -393,16 +411,24 @@ def fetch_from_neo4j(creds, query=None, label=None):
         list[dict]: Query results as list of dicts.
     """
     driver = None
+    if not query or not query.strip():
+        return {"error": "Neo4j: Query must be provided"}
+    
+    lowered = query.strip().lower()
+    
+    if not (lowered.startswith("match") or lowered.startswith("call")):
+        return {"error": "Neo4j: Only MATCH or CALL queries are allowed"}
+    
+    forbidden = ["create", "delete", "merge", "set", "drop"]
+    if any(f" {word} " in lowered for word in forbidden):
+        return {"error": f"Neo4j: Forbidden keyword detected"}
+    
     try:
         # Connect to Neo4j
         driver = GraphDatabase.driver(
             creds["uri"],
             auth=(creds["username"], creds["password"])
         )
-
-        # Build query if not given
-        if not query:
-            raise ValueError("Query must be provided")
 
         # Run query
         with driver.session(database=creds.get("database", "neo4j")) as session:
@@ -423,3 +449,35 @@ def fetch_from_neo4j(creds, query=None, label=None):
     finally:
         if driver:
             driver.close()
+
+
+def validate_sql_query(query: str, engine: str = "generic"):
+    """
+    Validate a SQL query to ensure safety (read-only, correct format).
+    
+    Args:
+        query (str): The SQL query string
+        engine (str): Name of the engine (used for error messages/logging)
+    
+    Returns:
+        dict: {"valid": True, "query": query} or {"valid": False, "error": "..."}
+    """
+    if not query or not query.strip():
+        return {"valid": False, "error": f"{engine}: Query must be provided"}
+    
+    lowered = query.strip().lower()
+
+    # must start with SELECT
+    if not lowered.startswith("select"):
+        return {"valid": False, "error": f"{engine}: Only SELECT queries are allowed"}
+    
+    # block forbidden keywords
+    forbidden = ["insert", "update", "delete", "drop", "alter", "truncate", "create", "grant", "revoke"]
+    if any(f" {word} " in lowered for word in forbidden):
+        return {"valid": False, "error": f"{engine}: Forbidden keyword detected"}
+    
+    # must contain FROM
+    if " from " not in lowered:
+        return {"valid": False, "error": f"{engine}: Invalid query (missing FROM clause)"}
+
+    return {"valid": True, "query": query}
