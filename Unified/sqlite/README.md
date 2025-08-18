@@ -11,6 +11,7 @@
    - `modules.py` → This script contains modules for SQLite actions
    - `view_table.py` → This script can be used to view the tables
    - `manager.py` → This script helps manage DB credentials stored via `init.py`
+   - `\helper_functions` → This dir contains all other smartcard ingetrator helper modules
 
 ### Available Functions (`modules.py`)
 
