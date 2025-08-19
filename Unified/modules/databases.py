@@ -399,7 +399,7 @@ def serialize_value(value):                                               # Conv
         return [serialize_value(v) for v in value]
     return value
 
-def fetch_from_neo4j(creds, query=None, label=None):
+def fetch_from_neo4j(creds, query=None):
     """
     Fetch data from a Neo4j database.
 
