@@ -9,3 +9,5 @@ databricks-sql-connector
 neo4j
 elasticsearch
 influxdb-client
+dotenv
+redis
