@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from modules import *
+from ..modules import *
 import uuid
 
 load_dotenv()
@@ -52,6 +52,12 @@ CREDENTIALS_DOI = {
         "username": os.getenv("ES_USERNAME"),
         "password": os.getenv("ES_PASSWORD"),
         "default_index": os.getenv("ES_DEFAULT_INDEX", "logs-*")
+    },
+        "opensearch": {
+        "host": os.getenv("OS_HOST", "http://localhost:9200"),
+        "username": os.getenv("OS_USERNAME", "admin"),
+        "password": os.getenv("OS_PASSWORD"),
+        "default_index": os.getenv("OS_DEFAULT_INDEX", "logs-*")
     }
 }
 
@@ -119,10 +125,18 @@ PRODUCT_METADATA_DOI = {
         "query_type": "Elasticsearch DSL",
         "example_query": '{"query":{"match":{"message":"error"}},"size":10}',
         "notes": "Use cloud_id and basic_auth. Returns full Elasticsearch response dict. Ensure index exists."
+    },
+    "opensearch": {
+        "description": "OpenSearch via REST or official client; DSL queries supported.",
+        "required_credentials": ["host", "username", "password"],
+        "required_parameters": ["credentials", "index", "dsl_query"],
+        "query_type": "OpenSearch DSL",
+        "example_query": '{"query": {"match": {"message": "error"}}, "size": 10}',
+        "notes": "Connect directly to OpenSearch endpoint. Use HTTP(S) host, not cloud_id. Ensure index exists."
     }
 }
 
-DB_NAME = "wwwsmart_credentials.db"
+DB_NAME = "Unified/sqlite/wwwsmart_credentials.db"
 
 # Create DoI table (DevOps & IoT)
 create_table(DB_NAME, "DoI_connector_credentials")

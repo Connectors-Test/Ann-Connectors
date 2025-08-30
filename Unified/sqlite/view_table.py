@@ -26,5 +26,5 @@ def view_table_json(db_name, table):
                 print(f"🔹 {key}: {value}")
     conn.close()
 
-view_table_json("wwwsmart_credentials.db", "Ecom_connector_credentials")
+view_table_json("wwwsmart_credentials.db", "DoI_connector_credentials")
 # view_table_json("wwwsmart_credentials.db", "SS_connector_credentials")

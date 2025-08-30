@@ -2,6 +2,7 @@ import requests
 import psycopg2
 import redis
 from elasticsearch import Elasticsearch
+from opensearchpy import OpenSearch
 import time
 from influxdb_client import InfluxDBClient
 
@@ -216,6 +217,38 @@ def fetch_from_elasticsearch(creds, dsl_query, index):
         return {
             "status": "error",
             "message": f"Elasticsearch fetch failed: {str(e)}"
+        }
+
+def fetch_from_opensearch(creds, dsl_query, index):
+    """
+    creds: { 'host': str, 'username': str, 'password': str }
+    index: OpenSearch index name
+    dsl_query: dict representing OpenSearch DSL query
+    """
+    if not isinstance(dsl_query, dict):
+        return {"status": "error", "message": "OpenSearch: query must be a dict"}
+
+    if not isinstance(index, str) or not index.strip():
+        return {"status": "error", "message": "OpenSearch: invalid index"}
+
+    forbidden = ["delete", "update", "reindex"]
+    if any(word in str(dsl_query).lower() for word in forbidden):
+        return {"status": "error", "message": "OpenSearch: forbidden operation detected"}
+
+    try:
+        client = OpenSearch(
+            hosts=[creds["host"]],
+            http_auth=(creds["username"], creds["password"]),
+            use_ssl=creds["host"].startswith("https"),
+            verify_certs=False
+        )
+        resp = client.search(index=index, body=dsl_query)
+        return resp
+
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"OpenSearch fetch failed: {str(e)}"
         }
 
 

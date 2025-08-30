@@ -2,7 +2,7 @@ from dotenv import load_dotenv
 import os
 import sqlite3
 import json
-from modules import *
+from ..modules import *
 
 load_dotenv()
 
@@ -94,7 +94,7 @@ APP_METADATA = {
     }
 }
 
-DB_NAME = "wwwsmart_credentials.db"
+DB_NAME = "Unified/sqlite/wwwsmart_credentials.db"
 conn = sqlite3.connect(DB_NAME)
 conn.close()
 

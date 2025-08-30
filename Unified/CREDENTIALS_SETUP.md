@@ -231,6 +231,16 @@ This guide provides detailed steps to obtain and configure credentials for all s
 
 ---
 
+### OpenSearch (Docker)
+1. Make sure Docker is installed
+2. Pull the OpenSearch image: `docker pull opensearchproject/opensearch:latest` (run in cmd)
+3. Run container: Change your password and run the below command
+```bash
+docker run -d -p 9200:9200 -p 9600:9600 -e "discovery.type=single-node" -e "OPENSEARCH_INITIAL_ADMIN_PASSWORD=Your password" -e "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m" opensearchproject/opensearch:latest
+```
+
+---
+
 ## E-Commerce Connectors (ECOM)
 
 ### Zoho

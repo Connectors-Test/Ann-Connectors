@@ -169,6 +169,12 @@ def doi_query_data(productType):
             # query param should be JSON DSL
             index = request.args.get("index", creds.get("default_index", "_all"))
             return fetch_from_elasticsearch(creds, query, index)
+        
+        elif productType.lower() == "opensearch":
+            # query param should be JSON DSL
+            index = request.args.get("index", "_all")
+            dsl_query = json.loads(query)
+            return fetch_from_opensearch(creds, dsl_query, index)
 
         else:
             return jsonify({"status": "error", "message": "Unsupported productType"}), 400
