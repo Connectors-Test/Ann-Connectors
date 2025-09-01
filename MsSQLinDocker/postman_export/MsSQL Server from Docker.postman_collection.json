@@ -1,0 +1,272 @@
+{
+	"info": {
+		"_postman_id": "a212714c-9374-4373-8a61-a40d3224c0c4",
+		"name": "MsSQL Server from Docker",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "46983115",
+		"_collection_link": "https://spacecraft-architect-20508722-5474214.postman.co/workspace/Ann-Krupa-Thomas's-Workspace~1f89a112-7de9-4162-8cf8-104b29c78c18/collection/46983115-a212714c-9374-4373-8a61-a40d3224c0c4?action=share&source=collection_link&creator=46983115"
+	},
+	"item": [
+		{
+			"name": "fetch database",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/fetch-databases",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"fetch-databases"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "fetch tables",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/fetch-tables?db=SCAI",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"fetch-tables"
+					],
+					"query": [
+						{
+							"key": "db",
+							"value": "SCAI"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "fetch columns",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/fetch-columns?db=SCAI",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"fetch-columns"
+					],
+					"query": [
+						{
+							"key": "db",
+							"value": "SCAI"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "fetch data",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/fetch-data?db=SCAI&table=Users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"fetch-data"
+					],
+					"query": [
+						{
+							"key": "db",
+							"value": "SCAI"
+						},
+						{
+							"key": "table",
+							"value": "Users"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get column data",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/api/data/SCAI/Users/name",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"data",
+						"SCAI",
+						"Users",
+						"name"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get schema",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/Schema/Users?db=SCAI",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"Schema",
+						"Users"
+					],
+					"query": [
+						{
+							"key": "db",
+							"value": "SCAI"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "list table",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/listtable/SCAI",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"listtable",
+						"SCAI"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "list columns",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/listcolumns/SCAI/Users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"listcolumns",
+						"SCAI",
+						"Users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "preview data",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/Previewdata/SCAI/Users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"Previewdata",
+						"SCAI",
+						"Users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "query",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/query?db=SCAI&table=Users&query=SELECT%20*%20",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"query"
+					],
+					"query": [
+						{
+							"key": "db",
+							"value": "SCAI"
+						},
+						{
+							"key": "table",
+							"value": "Users"
+						},
+						{
+							"key": "query",
+							"value": "SELECT%20*%20"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "metadata",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/metadata",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"metadata"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
