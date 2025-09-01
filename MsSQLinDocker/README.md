@@ -28,6 +28,7 @@ To run use the below command
 docker compose -f "docker-compose.yml" up -d --build
 ```
 A successful building will look like this ![success](img/success.png)
+
 The App will now be available at `http://127.0.0.1:5000/` capable of accessing data from the local docker deployed mssql
 
 ## Step 5: Test with Postman
