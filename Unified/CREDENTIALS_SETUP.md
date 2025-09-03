@@ -52,6 +52,17 @@ This guide provides detailed steps to obtain and configure credentials for all s
 
 1. Log into [HubSpot Developer Portal](https://developers.hubspot.com/).
 2. Create an app and generate access tokens.
+
+---
+
+### ERPNext
+
+1. Go to [frappecloud.com](https://frappecloud.com?utm_source=chatgpt.com)
+2. Start a site using free trial, add that site url to the .env base_url
+3. Go to https://your-base-url/app/users -> User -> Select you user
+4. From there go to Roles & Permissions -> Select All -> Save
+5. Then move to the Setting tab -> API Access -> Generate Keys, add that key and secret seperately to the .env
+
 ---
 
 ## Database Connectors (DB)
