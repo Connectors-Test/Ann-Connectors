@@ -248,3 +248,41 @@ def fetch_from_hubspot(creds, app_type, endpoint, params=None, method="GET"):
     
     resp = requests.request(method, url, headers=headers, json=params if method=="POST" else None, params=params if method=="GET" else None)
     return resp.json()
+
+def fetch_from_erpnext(creds, endpoint, params=None, method="GET"):
+    """
+    Fetch data from ERPNext REST API.
+    
+    creds: dict containing base_url, api_key, api_secret
+    endpoint: str - relative endpoint like "/api/resource/Customer"
+    params: dict (optional) - query params or payload
+    method: str - HTTP method ("GET", "POST", "PUT", "DELETE")
+    """
+    if not endpoint:
+        return {"status": "error", "message": "endpoint is required"}, 400
+
+    base_url = creds.get("base_url")
+    if not base_url:
+        return {"status": "error", "message": "Missing base_url in credentials"}, 400
+
+    url = f"{base_url.rstrip('/')}{endpoint}"
+    headers = {
+        "Authorization": f"token {creds['api_key']}:{creds['api_secret']}",
+        "Content-Type": "application/json"
+    }
+
+    if not isinstance(params, dict):
+        return {"status": "error", "message": "Invalid params format: must be a dict"}
+
+    try:
+        resp = requests.request(
+            method.upper(),
+            url,
+            headers=headers,
+            params=params if method.upper() == "GET" else None,
+            json=params if method.upper() in ["POST", "PUT"] else None
+        )
+        resp.raise_for_status()
+        return resp.json(), resp.status_code
+    except requests.exceptions.RequestException as e:
+        return {"status": "error", "message": f"ERPNext fetch failed: {str(e)}"}, 500

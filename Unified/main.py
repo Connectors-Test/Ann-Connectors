@@ -318,8 +318,17 @@ def app_query_data(productType):
                 params = json.loads(params)
             except:
                 return jsonify({"status": "error", "message": "params must be a valid JSON string"}), 400
-
             return fetch_from_hubspot(creds, app_type, endpoint, params)
+        
+        elif pt == "erpnext":
+            endpoint = request.args.get("endpoint")
+            params = request.args.get("params", "{}")
+            method = request.args.get("method", "GET")  # default GET
+            try:
+                params = json.loads(params)
+            except:
+                return jsonify({"status": "error", "message": "params must be a valid JSON string"}), 400
+            return fetch_from_erpnext(creds, endpoint, params, method)
 
         else:
             return jsonify({"status": "error", "message": "Unsupported productType"}), 400

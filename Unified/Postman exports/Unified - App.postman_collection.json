@@ -181,6 +181,68 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "HubSpot",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/query/app/hubspot?app_type=contacts&endpoint=list&params={\"limit\":5}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"query",
+						"app",
+						"hubspot"
+					],
+					"query": [
+						{
+							"key": "app_type",
+							"value": "contacts"
+						},
+						{
+							"key": "endpoint",
+							"value": "list"
+						},
+						{
+							"key": "params",
+							"value": "{\"limit\":5}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ERPNext",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/query/app/erpnext?endpoint=/api/resource/Warehouse",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"query",
+						"app",
+						"erpnext"
+					],
+					"query": [
+						{
+							"key": "endpoint",
+							"value": "/api/resource/Warehouse"
+						}
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }

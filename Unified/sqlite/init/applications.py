@@ -39,6 +39,11 @@ APP_CREDENTIALS = {
     },
     "hubspot": {
         "access_token": os.getenv("HUBSPOT_ACCESS_TOKEN")
+    },
+    "erpnext": {
+        "base_url": os.getenv("ERPNEXT_BASE_URL"),   # e.g. https://erpnext-scai.m.erpnext.com
+        "api_key": os.getenv("ERPNEXT_API_KEY"),
+        "api_secret": os.getenv("ERPNEXT_API_SECRET")
     }
 }
 
@@ -90,6 +95,14 @@ APP_METADATA = {
         "required_parameters": ["credentials", "endpoint", "params"],
         "query_type": "REST API",
         "example_query": "/crm/v3/objects/contacts",
+        "method": "GET"
+    },    
+    "erpnext": {
+        "description": "ERPNext REST API access.",
+        "required_credentials": ["base_url", "api_key", "api_secret"],
+        "required_parameters": ["credentials", "endpoint", "params"],
+        "query_type": "REST API",
+        "example_query": "/api/resource/Customer",   # Customers table
         "method": "GET"
     }
 }
