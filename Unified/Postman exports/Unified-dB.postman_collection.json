@@ -286,7 +286,29 @@
 			"name": "Oracle23ai",
 			"request": {
 				"method": "GET",
-				"header": []
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/query/db/oracle23?query=SELECT+*+FROM+devops_metrics+FETCH+FIRST+5+ROWS+ONLY",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"query",
+						"db",
+						"oracle23"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "SELECT+*+FROM+devops_metrics+FETCH+FIRST+5+ROWS+ONLY"
+						}
+					]
+				}
 			},
 			"response": []
 		}
