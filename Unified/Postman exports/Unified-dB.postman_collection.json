@@ -13,7 +13,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:5000/query/db/postgresql?query=SELECT%20*%20LIMIT%2010&table=DevOps",
+					"raw": "http://localhost:5000/query/db/postgresql?query=SELECT * FROM \"DevOps\" LIMIT 5;",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -27,11 +27,7 @@
 					"query": [
 						{
 							"key": "query",
-							"value": "SELECT%20*%20LIMIT%2010"
-						},
-						{
-							"key": "table",
-							"value": "DevOps"
+							"value": "SELECT * FROM \"DevOps\" LIMIT 5;"
 						}
 					]
 				}
@@ -44,7 +40,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:5000/query/db/databricks?query=SELECT%20*%20LIMIT%2010&table=DevOps",
+					"raw": "http://localhost:5000/query/db/databricks?query=SELECT * FROM DevOps LIMIT 5",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -58,11 +54,7 @@
 					"query": [
 						{
 							"key": "query",
-							"value": "SELECT%20*%20LIMIT%2010"
-						},
-						{
-							"key": "table",
-							"value": "DevOps"
+							"value": "SELECT * FROM DevOps LIMIT 5"
 						}
 					]
 				}
@@ -204,7 +196,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:5000/query/db/mysql?query=SELECT%20*%20LIMIT%2010&table=DevOps\n",
+					"raw": "http://localhost:5000/query/db/mysql?query=SELECT * FROM DevOps LIMIT 5;",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -218,11 +210,7 @@
 					"query": [
 						{
 							"key": "query",
-							"value": "SELECT%20*%20LIMIT%2010"
-						},
-						{
-							"key": "table",
-							"value": "DevOps\n"
+							"value": "SELECT * FROM DevOps LIMIT 5;"
 						}
 					]
 				}
@@ -235,7 +223,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:5000/query/db/supabase?query=SELECT%20*%20LIMIT%2010&table=DevOps",
+					"raw": "http://localhost:5000/query/db/supabase?query=SELECT * FROM \"DevOps\" LIMIT 5;",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -249,11 +237,7 @@
 					"query": [
 						{
 							"key": "query",
-							"value": "SELECT%20*%20LIMIT%2010"
-						},
-						{
-							"key": "table",
-							"value": "DevOps"
+							"value": "SELECT * FROM \"DevOps\" LIMIT 5;"
 						}
 					]
 				}
@@ -262,6 +246,44 @@
 		},
 		{
 			"name": "Neo4j",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "Oracle19c",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/query/db/oracle19?query=SELECT+*+FROM+devops_metrics+FETCH+FIRST+5+ROWS+ONLY",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"query",
+						"db",
+						"oracle19"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "SELECT+*+FROM+devops_metrics+FETCH+FIRST+5+ROWS+ONLY"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Oracle23ai",
 			"request": {
 				"method": "GET",
 				"header": []
