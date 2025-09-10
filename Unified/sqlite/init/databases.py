@@ -53,6 +53,13 @@ CREDENTIALS = {
         "username": os.getenv("NEO4J_USERNAME"),
         "password": os.getenv("NEO4J_PASSWORD"),
         "database": os.getenv("NEO4J_DATABASE")
+    },
+    "oracle": {
+        "host": os.getenv("ORACLE_HOST"),
+        "port": int(os.getenv("ORACLE_PORT", 1521)),
+        "user": os.getenv("ORACLE_USER"),
+        "password": os.getenv("ORACLE_PASSWORD"),
+        "service_name": os.getenv("ORACLE_SERVICE_NAME")  # e.g. "XEPDB1" or "scaipdb"
     }
 }
 
@@ -118,6 +125,13 @@ PRODUCT_METADATA = {
         "required_parameters": ["credentials", "query"],
         "query_type": "Cypher",
         "example_query": "MATCH (n:DevOps) RETURN n LIMIT 10"
+    },
+    "oracle": {
+        "description": "Oracle Database 19c or 23c connection using cx_Oracle/oracledb driver.",
+        "required_credentials": ["host", "port", "user", "password", "service_name"],
+        "required_parameters": ["credentials", "query"],
+        "query_type": "Oracle SQL",
+        "example_query": "SELECT * FROM devops_metrics FETCH FIRST 10 ROWS ONLY"
     }
 }
 

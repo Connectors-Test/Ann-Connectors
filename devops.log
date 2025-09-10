@@ -1,0 +1,62 @@
+
+SQL*Loader: Release 19.0.0.0.0 - Production on Wed Sep 10 17:01:28 2025
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle and/or its affiliates.  All rights reserved.
+
+Control File:   devops.ctl
+Data File:      C:\Users\Krupa\Downloads\devops.csv
+  Bad File:     devops.bad
+  Discard File:  none specified
+ 
+ (Allow all discards)
+
+Number to load: ALL
+Number to skip: 0
+Errors allowed: 50
+Bind array:     250 rows, maximum of 1048576 bytes
+Continuation:    none specified
+Path used:      Conventional
+
+Table DEVOPS_METRICS, loaded from every logical record.
+Insert option in effect for this table: APPEND
+TRAILING NULLCOLS option in effect
+
+   Column Name                  Position   Len  Term Encl Datatype
+------------------------------ ---------- ----- ---- ---- ---------------------
+METRIC_DATE                         FIRST     *   ,  O(") DATE YYYY-MM-DD      
+TOTAL_BUILDS                         NEXT     *   ,  O(") CHARACTER            
+SUCCESSFUL_BUILDS                    NEXT     *   ,  O(") CHARACTER            
+FAILED_TESTS                         NEXT     *   ,  O(") CHARACTER            
+DEPLOYMENTS                          NEXT     *   ,  O(") CHARACTER            
+MTTR_MINS                            NEXT     *   ,  O(") CHARACTER            
+ACTIVE_BUILDS                        NEXT     *   ,  O(") CHARACTER            
+CODE_COVERAGE_PCT                    NEXT     *   ,  O(") CHARACTER            
+COMMITS                              NEXT     *   ,  O(") CHARACTER            
+OPEN_PRS                             NEXT     *   ,  O(") CHARACTER            
+ROLLBACK_EVENTS                      NEXT     *   ,  O(") CHARACTER            
+
+Record 1: Rejected - Error on table DEVOPS_METRICS, column METRIC_DATE.
+ORA-01841: (full) year must be between -4713 and +9999, and not be 0
+
+
+Table DEVOPS_METRICS:
+  578 Rows successfully loaded.
+  1 Row not loaded due to data errors.
+  0 Rows not loaded because all WHEN clauses were failed.
+  0 Rows not loaded because all fields were null.
+
+
+Space allocated for bind array:                 709500 bytes(250 rows)
+Read   buffer bytes: 1048576
+
+Total logical records skipped:          0
+Total logical records read:           579
+Total logical records rejected:         1
+Total logical records discarded:        0
+
+Run began on Wed Sep 10 17:01:28 2025
+Run ended on Wed Sep 10 17:01:29 2025
+
+Elapsed time was:     00:00:01.25
+CPU time was:         00:00:00.31

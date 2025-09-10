@@ -9,6 +9,7 @@ from bson import json_util, ObjectId
 import mysql.connector
 from neo4j import GraphDatabase
 from neo4j.time import DateTime
+import oracledb
 
 def fetch_from_databricks(creds, query=None):
     conn = None
@@ -449,6 +450,62 @@ def fetch_from_neo4j(creds, query=None):
     finally:
         if driver:
             driver.close()
+
+def fetch_from_oracle(creds, query=None):
+    """
+    Fetch data from Oracle 19c using python-oracledb (thin mode).
+    
+    Args:
+        creds (dict): Must have 'host', 'port', 'user', 'password', 'service_name'
+        query (str): SQL SELECT query
+
+    Returns:
+        list[dict]: Query results as list of dicts
+    """
+    conn = None
+    cur = None
+
+    validation = validate_sql_query(query, engine="oraclec")
+    if not validation["valid"]:
+        return {"status": "error", "message": validation["error"]}
+    query = validation["query"]
+
+    try:
+        # Build DSN
+        dsn = oracledb.makedsn(
+            creds["host"],
+            creds.get("port", 1521),
+            service_name=creds["service_name"]
+        )
+
+        # Connect
+        conn = oracledb.connect(
+            user=creds["user"],
+            password=creds["password"],
+            dsn=dsn
+        )
+        cur = conn.cursor()
+
+        # Execute query
+        cur.execute(query)
+
+        # Extract results
+        columns = [col[0] for col in cur.description]
+        rows = cur.fetchall()
+        results = [dict(zip(columns, row)) for row in rows]
+
+        return results
+
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"oraclec fetch failed: {str(e)}"
+        }
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
 
 
 def validate_sql_query(query: str, engine: str = "generic"):
