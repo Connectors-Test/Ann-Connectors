@@ -145,6 +145,20 @@ This guide provides detailed steps to obtain and configure credentials for all s
 
 ---
 
+### Oracle 
+1. Download your required version of Oracle dB from their [official site](https://www.oracle.com/database/technologies/oracle-database-software-downloads.html)
+2. Note the service name (something like ORCLPDB1 by default) you give while creating db during installation
+3. After successful installation run `sqlplus sys/<your_password>@localhost:1521/<your_service_name> as sysdba`
+4. Create new user inside sqlplus using
+```bash
+CREATE USER <user_name> IDENTIFIED BY <user_password>;
+GRANT CONNECT, RESOURCE TO <user_name>;
+ALTER USER <user_name> QUOTA UNLIMITED ON users;
+EXIT
+```
+5. Create your required tables from that user after running `sqlplus <user_name>/<user_password>@localhost:1521/<your_service_name> as sysdba`
+6. Use these credentials in your .env
+
 ## DevOps & IoT Connectors (DOI)
 
 ### ClickHouse

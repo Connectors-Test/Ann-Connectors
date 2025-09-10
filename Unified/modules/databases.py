@@ -451,7 +451,7 @@ def fetch_from_neo4j(creds, query=None):
         if driver:
             driver.close()
 
-def fetch_from_oracle(creds, query=None):
+def fetch_from_oracle(creds, query=None, version=None):
     """
     Fetch data from Oracle 19c using python-oracledb (thin mode).
     
@@ -470,6 +470,11 @@ def fetch_from_oracle(creds, query=None):
         return {"status": "error", "message": validation["error"]}
     query = validation["query"]
 
+    if version == 23:
+        user="C##"+creds["user"].upper() if not creds["user"].startswith("C##") else creds["user"].upper()
+    else:
+        user=creds["user"]
+
     try:
         # Build DSN
         dsn = oracledb.makedsn(
@@ -480,7 +485,7 @@ def fetch_from_oracle(creds, query=None):
 
         # Connect
         conn = oracledb.connect(
-            user=creds["user"],
+            user=user,
             password=creds["password"],
             dsn=dsn
         )

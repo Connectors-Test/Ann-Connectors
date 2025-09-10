@@ -71,8 +71,11 @@ def db_query_data(productType):
         elif productType.lower() == "neo4j":
             return fetch_from_neo4j(creds, query)
         
-        elif productType.lower() == "oracle":
+        elif productType.lower() == "oracle19":
             return fetch_from_oracle(creds, query)
+        
+        elif productType.lower() == "oracle23":
+            return fetch_from_oracle(creds, query, version=23)
         
         else:
             return jsonify({"status": "error", "message": "Unsupported productType"}), 400

@@ -1,8 +1,8 @@
 
-SQL*Loader: Release 19.0.0.0.0 - Production on Wed Sep 10 17:01:28 2025
-Version 19.3.0.0.0
+SQL*Loader: Release 23.0.0.0.0 - Production on Thu Sep 11 02:25:41 2025
+Version 23.9.0.25.07
 
-Copyright (c) 1982, 2019, Oracle and/or its affiliates.  All rights reserved.
+Copyright (c) 1982, 2025, Oracle and/or its affiliates.  All rights reserved.
 
 Control File:   devops.ctl
 Data File:      C:\Users\Krupa\Downloads\devops.csv
@@ -38,6 +38,7 @@ ROLLBACK_EVENTS                      NEXT     *   ,  O(") CHARACTER
 
 Record 1: Rejected - Error on table DEVOPS_METRICS, column METRIC_DATE.
 ORA-01841: (full) year must be between -4713 and +9999, and not be 0
+Help: https://docs.oracle.com/error-help/db/ora-01841/
 
 
 Table DEVOPS_METRICS:
@@ -55,8 +56,8 @@ Total logical records read:           579
 Total logical records rejected:         1
 Total logical records discarded:        0
 
-Run began on Wed Sep 10 17:01:28 2025
-Run ended on Wed Sep 10 17:01:29 2025
+Run began on Thu Sep 11 02:25:41 2025
+Run ended on Thu Sep 11 02:25:50 2025
 
-Elapsed time was:     00:00:01.25
-CPU time was:         00:00:00.31
+Elapsed time was:     00:00:08.41
+CPU time was:         00:00:01.11
