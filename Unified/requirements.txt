@@ -11,3 +11,4 @@ elasticsearch
 influxdb-client
 dotenv
 redis
+opensearch-py

@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 import os
 import sqlite3
 from ..modules import *
+from sqlite.modules import create_table, upsert_credential
 
 load_dotenv()
 
@@ -52,7 +53,7 @@ CREDENTIALS = {
         "uri": os.getenv("NEO4J_URI"),
         "username": os.getenv("NEO4J_USERNAME"),
         "password": os.getenv("NEO4J_PASSWORD"),
-        "database": os.getenv("NEO4J_DATABASE")
+        "database": os.getenv("NEO4J_DATABASE","neo4j")
     }
 }
 

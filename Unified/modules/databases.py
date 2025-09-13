@@ -9,6 +9,7 @@ from bson import json_util, ObjectId
 import mysql.connector
 from neo4j import GraphDatabase
 from neo4j.time import DateTime
+from config import DB_CONFIG
 
 def fetch_from_databricks(creds, query=None):
     conn = None
@@ -52,7 +53,7 @@ def fetch_from_postgresql(creds, query=None):
     conn = None
     cur = None
     
-    validation = validate_sql_query(query, engine="PostgreSQL")
+    validation = validate_sql_query(query, engine="postgresql")
     if not validation["valid"]:
         return {"status": "error", "message": validation["error"]}
     query = validation["query"]
@@ -135,7 +136,7 @@ def fetch_from_mysql(creds, query=None):
     conn = None
     cur = None
     
-    validation = validate_sql_query(query, engine="PostgreSQL")
+    validation = validate_sql_query(query, engine="MySQL")
     if not validation["valid"]:
         return {"status": "error", "message": validation["error"]}
     query = validation["query"]
@@ -188,6 +189,7 @@ def fetch_from_mongodb(creds, query=None, collection=None, database=None, limit=
     Returns:
         list[dict]: Query results as list of dicts.
     """
+    creds = DB_CONFIG["mongodb"]
     client = None
     try:
         # Connect
@@ -410,6 +412,7 @@ def fetch_from_neo4j(creds, query=None):
     Returns:
         list[dict]: Query results as list of dicts.
     """
+    creds = DB_CONFIG["neo4j"]
     driver = None
     if not query or not query.strip():
         return {"error": "Neo4j: Query must be provided"}
@@ -439,7 +442,8 @@ def fetch_from_neo4j(creds, query=None):
                 for key, value in record.items():
                     clean_record[key] = serialize_value(value)
                 data.append(clean_record)
-            return data
+            # return data
+            return {"status": "success", "data": data}
 
     except Exception as e:
         return {
@@ -449,8 +453,7 @@ def fetch_from_neo4j(creds, query=None):
     finally:
         if driver:
             driver.close()
-
-
+    
 def validate_sql_query(query: str, engine: str = "generic"):
     """
     Validate a SQL query to ensure safety (read-only, correct format).

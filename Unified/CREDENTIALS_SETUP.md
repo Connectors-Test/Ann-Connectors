@@ -63,6 +63,7 @@ This guide provides detailed steps to obtain and configure credentials for all s
 
 ---
 
+
 ### PostgreSQL
 1. If hosted locally: use `localhost` as host, port is usually `5432`.
 2. If hosted on a server (e.g. AWS RDS, Azure, GCP):  

@@ -1,4 +1,5 @@
 import requests
+from config import APP_CONFIG
 
 def fetch_from_freshworks(creds, app_type, endpoint, params=None, method=None):
     """
@@ -134,6 +135,7 @@ def fetch_from_odoo(creds, model, method, args=None, kwargs=None):
     args: list of positional arguments for the method
     kwargs: dict of keyword arguments for the method
     """
+    creds = APP_CONFIG["odoo"]
     if args is not None and not isinstance(args, list):
         return {"status": "error", "message": "Invalid args format: must be a list"}
     if kwargs is not None and not isinstance(kwargs, dict):
@@ -151,8 +153,8 @@ def fetch_from_odoo(creds, model, method, args=None, kwargs=None):
                 creds["key"],
                 model,
                 method,
-                args or [],
-                kwargs or {}
+                args,
+                kwargs 
             ]
         }
     }

@@ -1,4 +1,8 @@
+import os
+import psycopg2
+import mysql.connector
 from flask import Flask, request, jsonify
+from dotenv import load_dotenv
 from sqlite_loader import *
 from modules.databases import *
 from modules.spreadsheet import *
@@ -341,16 +345,23 @@ def get_metadata(category, product_type):
     if category not in fetchers:
         return jsonify({"status": "error", "message": "Invalid category"}), 400
 
-    creds_list = fetchers[category]()
-    metadata_map = {c["name"].lower(): c.get("metadata", {}) for c in creds_list}
+    # Fetch credentials (no user_id/uuid by default, fallback included)
+    creds_list = fetchers[category](user_id=None, uuid=None)
 
-    if product_type:
-        data = metadata_map.get(product_type.lower())
-        if not data:
-            return jsonify({"status": "error", "message": "Invalid productType"}), 400
-        return jsonify({"status": "success", "data": data})
+    # Build a map of product_type -> full info (credentials + metadata)
+    metadata_map = {
+        c["name"].lower(): {
+            # "credentials": c["credentials"],
+            "metadata": c.get("metadata", {})
+        } for c in creds_list
+    }
 
-    return jsonify({"status": "success", "data": metadata_map})
+    # Check if requested product_type exists
+    data = metadata_map.get(product_type.lower())
+    if data is None:
+        return jsonify({"status": "error", "message": "Invalid productType"}), 400
+
+    return jsonify({"status": "success", "data": data})
 
 if __name__ == "__main__":
     app.run(debug=True)

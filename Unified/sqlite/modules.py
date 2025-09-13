@@ -97,7 +97,7 @@ def get_credentials(db_name, table, userid=None, uuid=None, product_name=None):
             creds = {"error": "Invalid JSON format"}
 
         try:
-            meta = json.loads(row[5])
+            meta = json.loads(row[5]) if row[5] else {}
         except (IndexError, json.JSONDecodeError):
             meta = {}
         
